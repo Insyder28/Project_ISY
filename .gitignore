@@ -27,8 +27,3 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-
-### temporary ###
-/server
-/javadoc
-/ignored
