@@ -1,3 +1,5 @@
+package Players;
+
 public class AITicTacToePlayer implements Player{
     @Override
     public int move() {
