@@ -6,9 +6,8 @@ import java.net.Socket;
 public class Connection {
     private Socket socket;
     private InputStreamReader in;
-    private ServerInputHandler serverInputHandler;
+    private networkHandler networkHandler;
     private PrintWriter out;
-    private String svrResponseBuffer;
 
     // Server events
     public final ServerEvent svrHelpEvent = new ServerEvent();
@@ -21,7 +20,6 @@ public class Connection {
     public final ServerEvent svrLossEvent = new ServerEvent();
     public final ServerEvent svrDrawEvent = new ServerEvent();
 
-
     // Methods
     public void connect(String hostName, int portNumber) {
         try {
@@ -31,15 +29,10 @@ public class Connection {
 
             if (socket == null) return;
 
-            serverInputHandler = new ServerInputHandler(in, this::handleSvrEvent);
-            new Thread(serverInputHandler).start();
+            networkHandler = new networkHandler(in, this::handleSvrEvent);
+            new Thread(networkHandler).start();
 
         } catch (IOException ignored) { }
-    }
-
-    //TODO: remove after testing
-    public void testCommand(String command) {
-        out.println(command);
     }
 
     public void disconnect() {
@@ -56,8 +49,24 @@ public class Connection {
         out.println("login " + playerName);
     }
 
+    public void command(String command, boolean returnsData) {
+        StringBuffer serverResponseBuffer = new StringBuffer();
+        networkHandler.bufferNextMessage(serverResponseBuffer, returnsData);
+        out.println(command);
+
+        synchronized (serverResponseBuffer) {
+            try {
+                serverResponseBuffer.wait();
+            } catch (InterruptedException ignored) { }
+        }
+
+        System.out.println(serverResponseBuffer);
+
+    }
+
+
     private void handleSvrEvent(String[] event) {
-        String[] args = event[1].split(" ");
+        String[] args = event[1].split(" ", 2);
 
         switch (event[0]) {
             case "HELP": svrHelpEvent.call(args);
@@ -71,47 +80,86 @@ public class Connection {
             case "DRAW": svrDrawEvent.call(args);
         }
     }
-
-
 }
 
-class ServerInputHandler implements Runnable {
+class networkHandler implements Runnable {
     private final InputStreamReader in;
     private final ServerEventListener serverEventListener;
 
+    private StringBuffer messageBuffer;
+    private volatile boolean bufferMessage;
+    private volatile boolean isDataMessage;
+
     // Constructor
-    ServerInputHandler(InputStreamReader in, ServerEventListener serverEventListener) {
+    networkHandler(InputStreamReader in, ServerEventListener serverEventListener) {
         this.in = in;
         this.serverEventListener = serverEventListener;
+    }
+
+    public void bufferNextMessage(StringBuffer buffer) {
+        bufferNextMessage(buffer, false);
+    }
+    public void bufferNextMessage(StringBuffer buffer, boolean isDataMessage) {
+
+        synchronized (buffer) {
+            this.messageBuffer = buffer;
+        }
+        this.bufferMessage = true;
+        this.isDataMessage = isDataMessage;
     }
 
     // Runnable method
     @Override
     public void run() {
         StringBuilder sb = new StringBuilder();
-
         int data;
 
         while (true) {
-            try { data = in.read(); }
-            catch (IOException e) {
-                break;
+            try { data = in.read(); }        // Read one integer from data stream.
+            catch (IOException e) { break; } // Exit loop when there is an IOException. (e.g. Data stream has been closed.)
+
+            if (data == -1) break;           // Exit loop if end of data stream has been reached.
+
+            char c = (char)data;             // Cast data (int) to char.
+
+            if (c != '\n') {                 // Check if end of line character has been reached.
+                sb.append(c);                // Append char to StringBuilder.
+                continue;
             }
 
-            if (data == -1) break;
+            // End of line has been reached
+            String message = sb.toString();
+            handleMessage(message);
+            sb.setLength(0);
+        }
+    }
 
-            char c = (char)data;
-            if (c != '\n')
-                sb.append(c);
-            else {
-                String message = sb.toString();
+    private void handleMessage(String message) {
+        if (bufferMessage) {
+            if (isDataMessage) {
+                if (message.startsWith("ERR")) {
+                    isDataMessage = false;
+                    bufferMessage = false;
 
-                if (message.startsWith("SVR ")) {
-                     serverEventListener.onEvent(message.replace("SVR ", "").split(" ", 2));
+                    synchronized (messageBuffer) {
+                        messageBuffer.append(message);
+                        messageBuffer.notify();
+                    }
                 }
-
-                sb.setLength(0);
+                else if (message.startsWith("OK"))
+                    isDataMessage = false;
             }
+            else {
+                bufferMessage = false;
+
+                synchronized (messageBuffer) {
+                    messageBuffer.append(message);
+                    messageBuffer.notify();
+                }
+            }
+        }
+        else if (message.startsWith("SVR ")) {
+            serverEventListener.onEvent(message.replace("SVR ", "").split(" ", 2));
         }
     }
 }
