@@ -6,7 +6,9 @@ import java.net.Socket;
 public class Connection {
     private Socket socket;
     private InputStreamReader in;
+    private ServerInputHandler serverInputHandler;
     private PrintWriter out;
+    private String svrResponseBuffer;
 
     // Server events
     public final ServerEvent svrHelpEvent = new ServerEvent();
@@ -29,9 +31,8 @@ public class Connection {
 
             if (socket == null) return;
 
-            ServerListener serverListener = new ServerListener(in);
-            Thread serverListenerThread = new Thread(serverListener);
-            serverListenerThread.start();
+            serverInputHandler = new ServerInputHandler(in, this::handleSvrEvent);
+            new Thread(serverInputHandler).start();
 
         } catch (IOException ignored) { }
     }
@@ -55,57 +56,61 @@ public class Connection {
         out.println("login " + playerName);
     }
 
+    private void handleSvrEvent(String[] event) {
+        String[] args = event[1].split(" ");
 
-    class ServerListener implements Runnable {
-        private final InputStreamReader in;
-
-        // Constructors
-        ServerListener(InputStreamReader in) {
-            this.in = in;
+        switch (event[0]) {
+            case "HELP": svrHelpEvent.call(args);
+            case "GAME": svrGameEvent.call(args);
+            case "MATCH": svrMatchEvent.call(args);
+            case "YOURTURN": svrYourTurnEvent.call(args);
+            case "MOVE": svrMoveEvent.call(args);
+            case "CHALLENGE": svrChallengeEvent.call(args);
+            case "WIN": svrWinEvent.call(args);
+            case "LOSS": svrLossEvent.call(args);
+            case "DRAW": svrDrawEvent.call(args);
         }
+    }
 
-        // Methods
-        @Override
-        public void run() {
-            StringBuilder sb = new StringBuilder();
 
-            int data;
+}
 
-            while (true) {
-                try { data = in.read(); }
-                catch (IOException e) {
-                    break;
-                }
+class ServerInputHandler implements Runnable {
+    private final InputStreamReader in;
+    private final ServerEventListener serverEventListener;
 
-                if (data == -1) break;
+    // Constructor
+    ServerInputHandler(InputStreamReader in, ServerEventListener serverEventListener) {
+        this.in = in;
+        this.serverEventListener = serverEventListener;
+    }
 
-                char c = (char)data;
-                if (c != '\n')
-                    sb.append(c);
-                else {
-                    String message = sb.toString();
-                    handleSvrMessage(message);
-                    sb.setLength(0);
-                }
+    // Runnable method
+    @Override
+    public void run() {
+        StringBuilder sb = new StringBuilder();
+
+        int data;
+
+        while (true) {
+            try { data = in.read(); }
+            catch (IOException e) {
+                break;
             }
-        }
 
-        private void handleSvrMessage(String message) {
-            if (message.startsWith("SVR ")) {
-                String[] event = message.replace("SVR ", "").split(" ", 2);
-                String[] args = event[1].split(" ");
+            if (data == -1) break;
 
-                switch (event[0]) {
-                    case "HELP": svrHelpEvent.call(args);
-                    case "GAME": svrGameEvent.call(args);
-                    case "MATCH": svrMatchEvent.call(args);
-                    case "YOURTURN": svrYourTurnEvent.call(args);
-                    case "MOVE": svrMoveEvent.call(args);
-                    case "CHALLENGE": svrChallengeEvent.call(args);
-                    case "WIN": svrWinEvent.call(args);
-                    case "LOSS": svrLossEvent.call(args);
-                    case "DRAW": svrDrawEvent.call(args);
+            char c = (char)data;
+            if (c != '\n')
+                sb.append(c);
+            else {
+                String message = sb.toString();
+
+                if (message.startsWith("SVR ")) {
+                     serverEventListener.onEvent(message.replace("SVR ", "").split(" ", 2));
                 }
+
+                sb.setLength(0);
             }
         }
     }
