@@ -49,7 +49,7 @@ public class Connection {
         out.println("login " + playerName);
     }
 
-    public void command(String command, boolean returnsData) {
+    public String command(String command, boolean returnsData) {
         StringBuffer serverResponseBuffer = new StringBuffer();
         networkHandler.bufferNextMessage(serverResponseBuffer, returnsData);
         out.println(command);
@@ -60,8 +60,7 @@ public class Connection {
             } catch (InterruptedException ignored) { }
         }
 
-        System.out.println(serverResponseBuffer);
-
+        return serverResponseBuffer.toString();
     }
 
 
@@ -100,7 +99,6 @@ class networkHandler implements Runnable {
         bufferNextMessage(buffer, false);
     }
     public void bufferNextMessage(StringBuffer buffer, boolean isDataMessage) {
-
         synchronized (buffer) {
             this.messageBuffer = buffer;
         }

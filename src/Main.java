@@ -4,7 +4,7 @@ public class Main {
         conn.connect("localhost", 7789);
         //conn.login("Erwin");
 
-        conn.command("get gamelist", true);
+        System.out.println(conn.command("pik", true));
 
         conn.disconnect();
     }
