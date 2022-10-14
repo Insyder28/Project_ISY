@@ -10,15 +10,14 @@ public class Connection {
     private PrintWriter out;
 
     // Server events
-    public final ServerEvent svrHelpEvent = new ServerEvent();
-    public final ServerEvent svrGameEvent = new ServerEvent();
-    public final ServerEvent svrMatchEvent = new ServerEvent();
-    public final ServerEvent svrYourTurnEvent = new ServerEvent();
-    public final ServerEvent svrMoveEvent = new ServerEvent();
-    public final ServerEvent svrChallengeEvent = new ServerEvent();
-    public final ServerEvent svrWinEvent = new ServerEvent();
-    public final ServerEvent svrLossEvent = new ServerEvent();
-    public final ServerEvent svrDrawEvent = new ServerEvent();
+    public final Event onGameEvent = new Event();
+    public final Event onMatchEvent = new Event();
+    public final Event onYourTurnEvent = new Event();
+    public final Event onMoveEvent = new Event();
+    public final Event onChallengeEvent = new Event();
+    public final Event onWinEvent = new Event();
+    public final Event onLossEvent = new Event();
+    public final Event onDrawEvent = new Event();
 
     // Methods
     public void connect(String hostName, int portNumber) {
@@ -63,36 +62,36 @@ public class Connection {
         return serverResponseBuffer.toString();
     }
 
+    private void handleSvrEvent(String event) {
+        String[] a = event.split(" ", 2);
+        String type = a[0];
+        String args = a[1];
 
-    private void handleSvrEvent(String[] event) {
-        String[] args = event[1].split(" ", 2);
-
-        switch (event[0]) {
-            case "HELP": svrHelpEvent.call(args);
-            case "GAME": svrGameEvent.call(args);
-            case "MATCH": svrMatchEvent.call(args);
-            case "YOURTURN": svrYourTurnEvent.call(args);
-            case "MOVE": svrMoveEvent.call(args);
-            case "CHALLENGE": svrChallengeEvent.call(args);
-            case "WIN": svrWinEvent.call(args);
-            case "LOSS": svrLossEvent.call(args);
-            case "DRAW": svrDrawEvent.call(args);
+        switch (type) {
+            case "GAME": onGameEvent.call(args);
+            case "MATCH": onMatchEvent.call(args);
+            case "YOURTURN": onYourTurnEvent.call(args);
+            case "MOVE": onMoveEvent.call(args);
+            case "CHALLENGE": onChallengeEvent.call(args);
+            case "WIN": onWinEvent.call(args);
+            case "LOSS": onLossEvent.call(args);
+            case "DRAW": onDrawEvent.call(args);
         }
     }
 }
 
 class networkHandler implements Runnable {
     private final InputStreamReader in;
-    private final ServerEventListener serverEventListener;
+    private final EventListener svrEventListener;
 
     private StringBuffer messageBuffer;
     private volatile boolean bufferMessage;
     private volatile boolean isDataMessage;
 
     // Constructor
-    networkHandler(InputStreamReader in, ServerEventListener serverEventListener) {
+    networkHandler(InputStreamReader in, EventListener svrEventListener) {
         this.in = in;
-        this.serverEventListener = serverEventListener;
+        this.svrEventListener = svrEventListener;
     }
 
     public void bufferNextMessage(StringBuffer buffer) {
@@ -147,7 +146,7 @@ class networkHandler implements Runnable {
                 else if (message.startsWith("OK"))
                     isDataMessage = false;
             }
-            else {
+            else if (message.startsWith("OK") || message.startsWith("SVR") || message.startsWith("ERR")) {
                 bufferMessage = false;
 
                 synchronized (messageBuffer) {
@@ -157,7 +156,8 @@ class networkHandler implements Runnable {
             }
         }
         else if (message.startsWith("SVR ")) {
-            serverEventListener.onEvent(message.replace("SVR ", "").split(" ", 2));
+            String event = message.replace("SVR ", "");
+            svrEventListener.onEvent(event);
         }
     }
 }

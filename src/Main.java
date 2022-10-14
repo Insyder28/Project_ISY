@@ -2,10 +2,12 @@ public class Main {
     public static void main(String[] args) {
         Connection conn = new Connection();
         conn.connect("localhost", 7789);
-        //conn.login("Erwin");
 
-        System.out.println(conn.command("pik", true));
+        System.out.println(conn.command("login Erwin", false));
+        System.out.println(conn.command("get gamelist", true));
 
-        conn.disconnect();
+        conn.onMatchEvent.addListener(System.out::println);
+
+        //conn.disconnect();
     }
 }
