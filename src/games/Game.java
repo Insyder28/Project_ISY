@@ -25,7 +25,7 @@ public class Game {
         board = new char[sizeX][sizeY];
         for (int y = 0; y < board.length; y++) {
             for (int x = 0; x < board[y].length; x++) {
-                board[x][y] = '0';
+                board[x][y] = ' ';
             }
         }
     }
