@@ -20,6 +20,7 @@ public class Connection {
     public final Event onDrawEvent = new Event();
 
     // Methods
+    //TODO: Exception when can't connect
     public void connect(String hostName, int portNumber) {
         try {
             socket = new Socket(hostName, portNumber);
@@ -34,6 +35,11 @@ public class Connection {
         } catch (IOException ignored) { }
     }
 
+    public boolean isConnected() {
+        if (socket == null) return false;
+        else return socket.isConnected();
+    }
+
     public void disconnect() {
         out.println("disconnect");
 
@@ -44,11 +50,27 @@ public class Connection {
         } catch (IOException ignored) { }
     }
 
-    public void login(String playerName) {
-        out.println("login " + playerName);
+    public void login(String playerName) throws DuplicateNameException {
+        checkConnection();
+
+        try {
+            command("login " + playerName, false);
+        }
+        catch (ServerException e) {
+            if (e.getMessage().equals("duplicate name exists")) throw new DuplicateNameException(e);
+        }
     }
 
-    public String command(String command, boolean returnsData) {
+    //TODO: get <gamelist | playerlist>
+    //TODO: subscribe
+    //TODO: move
+    //TODO: challenge [accept]
+    //TODO: forfeit
+    //TODO: message
+
+    private String command(String command, boolean returnsData) throws ServerException {
+        checkConnection();
+
         StringBuffer serverResponseBuffer = new StringBuffer();
         networkHandler.bufferNextMessage(serverResponseBuffer, returnsData);
         out.println(command);
@@ -59,7 +81,9 @@ public class Connection {
             } catch (InterruptedException ignored) { }
         }
 
-        return serverResponseBuffer.toString();
+        String response = serverResponseBuffer.toString();
+        if (response.startsWith("ERR ")) throw new ServerException(response.replace("ERR ", ""));
+        return response;
     }
 
     private void handleSvrEvent(String event) {
@@ -76,6 +100,41 @@ public class Connection {
             case "WIN": onWinEvent.call(args);
             case "LOSS": onLossEvent.call(args);
             case "DRAW": onDrawEvent.call(args);
+        }
+    }
+
+    // Error & Exception stuff
+    private void checkConnection() throws NotConnectedException {
+        if (!isConnected()) throw new NotConnectedException();
+    }
+
+    /**
+     * Gets thrown when there is no connection when a connection is needed.
+     */
+    public static class NotConnectedException extends RuntimeException {
+        public NotConnectedException() {
+            super("Not connected to a server.");
+        }
+        public NotConnectedException(String errorMessage) {
+            super(errorMessage);
+        }
+    }
+
+    /**
+     * Gets thrown when there is a server error/exception.
+     */
+    public static class ServerException extends RuntimeException {
+        public ServerException() {
+            super();
+        }
+        public ServerException(String errorMessage) {
+            super(errorMessage);
+        }
+    }
+
+    public static class DuplicateNameException extends Exception {
+        public  DuplicateNameException(Throwable cause) {
+            super("duplicate name exists", cause);
         }
     }
 }
@@ -131,6 +190,7 @@ class networkHandler implements Runnable {
         }
     }
 
+    //TODO: only start buffering messages when sequence starts with OK
     private void handleMessage(String message) {
         if (bufferMessage) {
             if (isDataMessage) {
