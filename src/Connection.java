@@ -10,29 +10,31 @@ public class Connection {
     private PrintWriter out;
 
     // Server events
-    public final Event onGameEvent = new Event();
     public final Event onMatchEvent = new Event();
     public final Event onYourTurnEvent = new Event();
     public final Event onMoveEvent = new Event();
     public final Event onChallengeEvent = new Event();
+    public final Event onChallengeCancelledEvent = new Event();
     public final Event onWinEvent = new Event();
     public final Event onLossEvent = new Event();
     public final Event onDrawEvent = new Event();
 
     // Methods
-    //TODO: Exception when can't connect
-    public void connect(String hostName, int portNumber) {
+    //TODO: Handle other exceptions
+    public void connect(String hostName, int portNumber) throws FailedToConnectException {
         try {
             socket = new Socket(hostName, portNumber);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new InputStreamReader(socket.getInputStream());
 
-            if (socket == null) return;
+            if (socket == null) throw new FailedToConnectException();
 
             networkHandler = new networkHandler(in, this::handleSvrEvent);
             new Thread(networkHandler).start();
 
-        } catch (IOException ignored) { }
+        } catch (IOException e) {
+            throw new FailedToConnectException(e);
+        }
     }
 
     public boolean isConnected() {
@@ -51,8 +53,6 @@ public class Connection {
     }
 
     public void login(String playerName) throws DuplicateNameException {
-        checkConnection();
-
         try {
             command("login " + playerName, false);
         }
@@ -61,12 +61,47 @@ public class Connection {
         }
     }
 
-    //TODO: get <gamelist | playerlist>
-    //TODO: subscribe
-    //TODO: move
-    //TODO: challenge [accept]
-    //TODO: forfeit
-    //TODO: message
+    public String[] getGameList() {
+        String response = command("get gamelist", true);
+        return toArray(response.split(" ", 3)[2]);
+    }
+
+    public String[] getPlayerList() {
+        String response = command("get playerlist", true);
+        return toArray(response.split(" ", 3)[2]);
+    }
+
+    public void subscribe(String gameType) throws ServerException {
+        command("subscribe " + gameType, false);
+    }
+
+    public void move(int index) throws ServerException {
+        command("move " + index, false);
+    }
+
+    public void challenge(String playerName, String gameType) throws ServerException {
+        command("challenge " + playerName + " " + gameType, false);
+    }
+
+    public void challengeAccept(int challengeId) throws ServerException {
+        command("challenge accept " + challengeId, false);
+    }
+
+    public void forfeit() throws ServerException{
+        command("forfeit", false);
+    }
+
+    public void message(String s) throws ServerException {
+        if (s.contains(" "))
+            command("message \"" + s + "\"", false);
+        else
+            command("message " + s, false);
+    }
+
+
+    private String[] toArray(String s) {
+        return s.substring(1, s.length() - 2).replace("\"", "").split(", ");
+    }
 
     private String command(String command, boolean returnsData) throws ServerException {
         checkConnection();
@@ -86,20 +121,21 @@ public class Connection {
         return response;
     }
 
-    private void handleSvrEvent(String event) {
-        String[] a = event.split(" ", 2);
+    private void handleSvrEvent(String message) {
+        String[] a = message.split(" ", 2);
         String type = a[0];
         String args = a[1];
 
         switch (type) {
-            case "GAME": onGameEvent.call(args);
             case "MATCH": onMatchEvent.call(args);
             case "YOURTURN": onYourTurnEvent.call(args);
             case "MOVE": onMoveEvent.call(args);
-            case "CHALLENGE": onChallengeEvent.call(args);
             case "WIN": onWinEvent.call(args);
             case "LOSS": onLossEvent.call(args);
             case "DRAW": onDrawEvent.call(args);
+            case "CHALLENGE":
+                if (args.startsWith("CANCELLED")) onChallengeCancelledEvent.call(args.split(" ", 2)[1]);
+                else onChallengeEvent.call(args);
         }
     }
 
@@ -117,6 +153,15 @@ public class Connection {
         }
         public NotConnectedException(String errorMessage) {
             super(errorMessage);
+        }
+    }
+
+    public static class FailedToConnectException extends Exception {
+        public FailedToConnectException() {
+            super("Can't connect to the server.");
+        }
+        public FailedToConnectException(Throwable cause) {
+            super("Can't connect to the server.", cause);
         }
     }
 
@@ -144,8 +189,9 @@ class networkHandler implements Runnable {
     private final EventListener svrEventListener;
 
     private StringBuffer messageBuffer;
-    private volatile boolean bufferMessage;
-    private volatile boolean isDataMessage;
+    private boolean bufferMessage;
+    private boolean isDataMessage;
+    private boolean receivedOk;
 
     // Constructor
     networkHandler(InputStreamReader in, EventListener svrEventListener) {
@@ -162,6 +208,7 @@ class networkHandler implements Runnable {
         }
         this.bufferMessage = true;
         this.isDataMessage = isDataMessage;
+        this.receivedOk = false;
     }
 
     // Runnable method
@@ -190,7 +237,6 @@ class networkHandler implements Runnable {
         }
     }
 
-    //TODO: only start buffering messages when sequence starts with OK
     private void handleMessage(String message) {
         if (bufferMessage) {
             if (isDataMessage) {
@@ -205,8 +251,9 @@ class networkHandler implements Runnable {
                 }
                 else if (message.startsWith("OK"))
                     isDataMessage = false;
+                    receivedOk = true;
             }
-            else if (message.startsWith("OK") || message.startsWith("SVR") || message.startsWith("ERR")) {
+            else if (message.startsWith("OK") || message.startsWith("ERR") || (message.startsWith("SVR") && receivedOk)) {
                 bufferMessage = false;
 
                 synchronized (messageBuffer) {
@@ -215,7 +262,7 @@ class networkHandler implements Runnable {
                 }
             }
         }
-        else if (message.startsWith("SVR ")) {
+        else if (message.startsWith("SVR GAME ")) {
             String event = message.replace("SVR ", "");
             svrEventListener.onEvent(event);
         }
