@@ -43,6 +43,8 @@ public class Connection {
     }
 
     public void disconnect() {
+        checkConnection();
+
         out.println("disconnect");
 
         try {
