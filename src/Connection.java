@@ -1,12 +1,21 @@
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+//TODO: Create wrappers for al synchronized objects https://stackoverflow.com/questions/32852464/how-to-avoid-synchronization-on-a-non-final-field
+
+/**
+ * Represents a connection with a game server.
+ * @author Erwin Veenhoven
+ */
 public class Connection {
     private Socket socket;
-    private InputStreamReader in;
-    private networkHandler networkHandler;
+    private InputStream in;
+    private ServerStreamReader serverStreamReader;
     private PrintWriter out;
 
     // Server events
@@ -21,27 +30,47 @@ public class Connection {
 
     // Methods
     //TODO: Handle other exceptions
+    @SuppressWarnings("unused")
     public void connect(String hostName, int portNumber) throws FailedToConnectException {
+        connect(hostName, portNumber, false);
+    }
+
+    public void connect(String hostName, int portNumber, boolean autoDisconnect) throws FailedToConnectException {
         try {
             socket = new Socket(hostName, portNumber);
             out = new PrintWriter(socket.getOutputStream(), true);
-            in = new InputStreamReader(socket.getInputStream());
+            in = socket.getInputStream();
 
             if (socket == null) throw new FailedToConnectException();
 
-            networkHandler = new networkHandler(in, this::handleSvrEvent);
-            new Thread(networkHandler).start();
+            serverStreamReader = new ServerStreamReader(in, this::handleSvrEvent);
+            new Thread(serverStreamReader).start();
+
+            //TODO: put auto disconnect in separate method
+            if (autoDisconnect) {
+                Thread main = Thread.currentThread();
+
+                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                executor.scheduleAtFixedRate(() -> {
+                    if (!main.isAlive()) {
+                        disconnect();
+                        executor.shutdown();
+                    }
+                }, 0, 500, TimeUnit.MILLISECONDS);
+            }
 
         } catch (IOException e) {
             throw new FailedToConnectException(e);
         }
     }
 
+    @SuppressWarnings("unused")
     public boolean isConnected() {
         if (socket == null) return false;
         else return socket.isConnected();
     }
 
+    @SuppressWarnings("unused")
     public void disconnect() {
         checkConnection();
 
@@ -54,6 +83,7 @@ public class Connection {
         } catch (IOException ignored) { }
     }
 
+    @SuppressWarnings("unused")
     public void login(String playerName) throws DuplicateNameException {
         try {
             command("login " + playerName, false);
@@ -63,36 +93,44 @@ public class Connection {
         }
     }
 
+    @SuppressWarnings("unused")
     public String[] getGameList() {
         String response = command("get gamelist", true);
         return toArray(response.split(" ", 3)[2]);
     }
 
+    @SuppressWarnings("unused")
     public String[] getPlayerList() {
         String response = command("get playerlist", true);
         return toArray(response.split(" ", 3)[2]);
     }
 
+    @SuppressWarnings("unused")
     public void subscribe(String gameType) throws ServerException {
         command("subscribe " + gameType, false);
     }
 
+    @SuppressWarnings("unused")
     public void move(int index) throws ServerException {
         command("move " + index, false);
     }
 
+    @SuppressWarnings("unused")
     public void challenge(String playerName, String gameType) throws ServerException {
         command("challenge " + playerName + " " + gameType, false);
     }
 
+    @SuppressWarnings("unused")
     public void challengeAccept(int challengeId) throws ServerException {
         command("challenge accept " + challengeId, false);
     }
 
+    @SuppressWarnings("unused")
     public void forfeit() throws ServerException{
         command("forfeit", false);
     }
 
+    @SuppressWarnings("unused")
     public void message(String s) throws ServerException {
         if (s.contains(" "))
             command("message \"" + s + "\"", false);
@@ -109,7 +147,7 @@ public class Connection {
         checkConnection();
 
         StringBuffer serverResponseBuffer = new StringBuffer();
-        networkHandler.bufferNextMessage(serverResponseBuffer, returnsData);
+        serverStreamReader.bufferNextMessage(serverResponseBuffer, returnsData);
         out.println(command);
 
         synchronized (serverResponseBuffer) {
@@ -153,9 +191,6 @@ public class Connection {
         public NotConnectedException() {
             super("Not connected to a server.");
         }
-        public NotConnectedException(String errorMessage) {
-            super(errorMessage);
-        }
     }
 
     public static class FailedToConnectException extends Exception {
@@ -171,9 +206,6 @@ public class Connection {
      * Gets thrown when there is a server error/exception.
      */
     public static class ServerException extends RuntimeException {
-        public ServerException() {
-            super();
-        }
         public ServerException(String errorMessage) {
             super(errorMessage);
         }
@@ -186,8 +218,8 @@ public class Connection {
     }
 }
 
-class networkHandler implements Runnable {
-    private final InputStreamReader in;
+class ServerStreamReader implements Runnable {
+    private final InputStream in;
     private final EventListener svrEventListener;
 
     private StringBuffer messageBuffer;
@@ -196,11 +228,13 @@ class networkHandler implements Runnable {
     private boolean receivedOk;
 
     // Constructor
-    networkHandler(InputStreamReader in, EventListener svrEventListener) {
+    @SuppressWarnings("unused")
+    ServerStreamReader(InputStream in, EventListener svrEventListener) {
         this.in = in;
         this.svrEventListener = svrEventListener;
     }
 
+    @SuppressWarnings("unused")
     public void bufferNextMessage(StringBuffer buffer) {
         bufferNextMessage(buffer, false);
     }
