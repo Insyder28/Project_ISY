@@ -180,7 +180,11 @@ public class GameSocket {
      */
     @SuppressWarnings("unused")
     public void challenge(String playerName, String gameType) throws ServerException {
-        command("challenge " + playerName + " " + gameType, false);
+        String name;
+        if (playerName.contains(" ")) name = '"' + playerName + '"';
+        else name = playerName;
+
+        command("challenge " + name + " " + gameType, false);
     }
 
     /**
