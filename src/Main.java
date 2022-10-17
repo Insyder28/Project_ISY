@@ -9,6 +9,6 @@ public class Main {
 
         for (var game : games) System.out.println(game);
 
-        conn.disconnect();
+
     }
 }

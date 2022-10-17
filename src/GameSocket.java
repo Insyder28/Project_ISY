@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.Executors;
@@ -13,7 +12,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class GameSocket {
     private Socket socket;
-    private InputStream in;
     private ServerStreamReader serverStreamReader;
     private PrintWriter out;
 
@@ -38,12 +36,9 @@ public class GameSocket {
         try {
             socket = new Socket(hostName, portNumber);
             out = new PrintWriter(socket.getOutputStream(), true);
-            in = socket.getInputStream();
+            serverStreamReader = new ServerStreamReader(socket.getInputStream(), this::handleSvrEvent);
 
             if (socket == null) throw new FailedToConnectException();
-
-            serverStreamReader = new ServerStreamReader(in, this::handleSvrEvent);
-            new Thread(serverStreamReader).start();
 
             //TODO: put auto disconnect in separate method
             if (autoDisconnect) {
@@ -64,7 +59,7 @@ public class GameSocket {
     }
 
     /**
-     * Checks if still connected to a server.
+     * Checks if the {@link GameSocket} still connected to a server.
      * @return true when connected to a server
      */
     @SuppressWarnings({"unused", "BooleanMethodIsAlwaysInverted"})
@@ -75,7 +70,7 @@ public class GameSocket {
     }
 
     /**
-     * Disconnects from the server.
+     * Disconnects the {@link GameSocket} from the server.
      */
     @SuppressWarnings("unused")
     public void disconnect() {
@@ -85,11 +80,16 @@ public class GameSocket {
 
         try {
             socket.close();
-            in.close();
+            serverStreamReader.close();
             out.close();
         } catch (IOException ignored) { }
     }
 
+    /**
+     * Logs player in on server.
+     * @param playerName name of the player
+     * @throws DuplicateNameException gets thrown when name is already in use by somebody else
+     */
     @SuppressWarnings("unused")
     public void login(String playerName) throws DuplicateNameException {
         try {
@@ -100,49 +100,85 @@ public class GameSocket {
         }
     }
 
+    /**
+     * @return available games on the server
+     */
     @SuppressWarnings("unused")
     public String[] getGameList() {
         String response = command("get gamelist", true);
         return toArray(response.split(" ", 3)[2]);
     }
 
+    /**
+     * @return currently logged in players on the server
+     */
     @SuppressWarnings("unused")
     public String[] getPlayerList() {
         String response = command("get playerlist", true);
         return toArray(response.split(" ", 3)[2]);
     }
 
+    /**
+     * Sign up for playing a specific game with someone.
+     * @param gameType the game to sign up for
+     * @throws ServerException gets thrown when a server error occurs while trying to subscribe to a game
+     */
     @SuppressWarnings("unused")
     public void subscribe(String gameType) throws ServerException {
         command("subscribe " + gameType, false);
     }
 
+    /**
+     * Submits a game move to the server.
+     * @param pos the board position from top left to bottom right
+     * @throws ServerException gets thrown when a server error occurs while trying to make a move
+     */
     @SuppressWarnings("unused")
-    public void move(int index) throws ServerException {
-        command("move " + index, false);
+    public void move(int pos) throws ServerException {
+        command("move " + pos, false);
     }
 
+    /**
+     * Create a challenge (invite) to play with another player.
+     * @param playerName name of player to challenge
+     * @param gameType the game to play
+     * @throws ServerException gets thrown when a server error occurs while trying to challenge another player
+     */
     @SuppressWarnings("unused")
     public void challenge(String playerName, String gameType) throws ServerException {
         command("challenge " + playerName + " " + gameType, false);
     }
 
+    /**
+     * Accept a challenge (invite) from a player.
+     * @param challengeId ID of the challenge
+     * @throws ServerException gets thrown when a server error occurs while trying to accept a challenge
+     */
     @SuppressWarnings("unused")
     public void challengeAccept(int challengeId) throws ServerException {
         command("challenge accept " + challengeId, false);
     }
 
+    /**
+     * Forfeit the current match.
+     * @throws ServerException gets thrown when a server error occurs while trying to forfeit
+     */
     @SuppressWarnings("unused")
     public void forfeit() throws ServerException{
         command("forfeit", false);
     }
 
+    /**
+     * Send message to other players.
+     * @param text text to send
+     * @throws ServerException gets thrown when a server error occurs while trying to send a message
+     */
     @SuppressWarnings("unused")
-    public void message(String s) throws ServerException {
-        if (s.contains(" "))
-            command("message \"" + s + "\"", false);
+    public void message(String text) throws ServerException {
+        if (text.contains(" "))
+            command("message \"" + text + "\"", false);
         else
-            command("message " + s, false);
+            command("message " + text, false);
     }
 
 
@@ -196,6 +232,9 @@ public class GameSocket {
         }
     }
 
+    /**
+     * Gets thrown when {@link GameSocket} failed to connect.
+     */
     public static class FailedToConnectException extends Exception {
         public FailedToConnectException() {
             super("Can't connect to the server.");
@@ -214,6 +253,9 @@ public class GameSocket {
         }
     }
 
+    /**
+     * Gets thrown when there is a duplicate name.
+     */
     public static class DuplicateNameException extends Exception {
         public  DuplicateNameException(Throwable cause) {
             super("duplicate name exists", cause);

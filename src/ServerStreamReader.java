@@ -1,13 +1,17 @@
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Wrapper for {@link InputStream} for handling server input.
  * @author Erwin Veenhoven
  */
-public class ServerStreamReader implements Runnable {
+public class ServerStreamReader {
     private final InputStream in;
     private final EventListener svrEventListener;
+
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private MessageBuffer messageBuffer;
     private boolean bufferResponse;
@@ -24,6 +28,8 @@ public class ServerStreamReader implements Runnable {
     ServerStreamReader(InputStream in, EventListener svrEventListener) {
         this.in = in;
         this.svrEventListener = svrEventListener;
+
+        executor.execute(this::handleInputStreamLoop);
     }
 
     /**
@@ -48,14 +54,18 @@ public class ServerStreamReader implements Runnable {
         this.receivedOk = false;
     }
 
-
-    //TODO: Check if can be made to executor service
-
     /**
-     *
+     * Closes the {@link ServerStreamReader} and the underlying {@link InputStream}.
      */
-    @Override
-    public void run() {
+    public void close() {
+        try { in.close(); }
+        catch (Exception ignored) { }
+
+        executor.shutdownNow();
+    }
+
+
+    private void handleInputStreamLoop() {
         StringBuilder sb = new StringBuilder();
         int data;
 
@@ -75,8 +85,10 @@ public class ServerStreamReader implements Runnable {
             // End of line has been reached
             String message = sb.toString();
             handleMessage(message);
-            sb.setLength(0);
+            sb.setLength(0);                 // Reset StringBuilder
         }
+
+        executor.shutdown();
     }
 
     private void handleMessage(String message) {
@@ -85,17 +97,19 @@ public class ServerStreamReader implements Runnable {
                 if (message.startsWith("ERR")) {
                     isDataResponse = false;
                     bufferResponse = false;
-
                     messageBuffer.setMessage(message);
-                } else if (message.startsWith("OK"))
+                }
+                else if (message.startsWith("OK")) {
                     isDataResponse = false;
-                receivedOk = true;
-            } else if (message.startsWith("OK") || message.startsWith("ERR") || (message.startsWith("SVR") && receivedOk)) {
+                    receivedOk = true;
+                }
+            }
+            else if (message.startsWith("OK") || message.startsWith("ERR") || (message.startsWith("SVR") && receivedOk)) {
                 bufferResponse = false;
-
                 messageBuffer.setMessage(message);
             }
-        } else if (message.startsWith("SVR GAME ")) {
+        }
+        else if (message.startsWith("SVR GAME ")) {
             String event = message.replace("SVR ", "");
             svrEventListener.onEvent(event);
         }
