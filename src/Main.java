@@ -1,6 +1,6 @@
 public class Main {
     public static void main(String[] args) {
-        Connection conn = new Connection();
+        GameSocket conn = new GameSocket();
 
         try { conn.connect("localhost", 7789, true); } catch (Exception ignored) { }
         try { conn.login("Erwin"); } catch (Exception ignored) { }
@@ -8,5 +8,7 @@ public class Main {
         String[] games = conn.getGameList();
 
         for (var game : games) System.out.println(game);
+
+        conn.disconnect();
     }
 }

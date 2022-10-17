@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  * Represents a connection with a game server.
  * @author Erwin Veenhoven
  */
-public class Connection {
+public class GameSocket {
     private Socket socket;
     private InputStream in;
     private ServerStreamReader serverStreamReader;
@@ -63,15 +63,23 @@ public class Connection {
         }
     }
 
-    @SuppressWarnings("unused")
+    /**
+     * Checks if still connected to a server.
+     * @return true when connected to a server
+     */
+    @SuppressWarnings({"unused", "BooleanMethodIsAlwaysInverted"})
     public boolean isConnected() {
         if (socket == null) return false;
-        else return socket.isConnected();
+        if (socket.isClosed()) return false;
+        return socket.isConnected();
     }
 
+    /**
+     * Disconnects from the server.
+     */
     @SuppressWarnings("unused")
     public void disconnect() {
-        checkConnection();
+        if (!isConnected()) return;
 
         out.println("disconnect");
 
@@ -146,7 +154,7 @@ public class Connection {
         checkConnection();
 
         MessageBuffer responseBuffer = new MessageBuffer();
-        serverStreamReader.bufferNextMessage(responseBuffer, returnsData);
+        serverStreamReader.bufferNextResponse(responseBuffer, returnsData);
         out.println(command);
 
         responseBuffer.awaitMessage();

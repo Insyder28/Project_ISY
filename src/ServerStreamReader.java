@@ -2,55 +2,70 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Wrapper for {@link java.io.InputStream} for handling server input.
+ * Wrapper for {@link InputStream} for handling server input.
  * @author Erwin Veenhoven
  */
-class ServerStreamReader implements Runnable {
+public class ServerStreamReader implements Runnable {
     private final InputStream in;
     private final EventListener svrEventListener;
 
     private MessageBuffer messageBuffer;
-    private boolean bufferMessage;
-    private boolean isDataMessage;
+    private boolean bufferResponse;
+    private boolean isDataResponse;
     private boolean receivedOk;
 
-    // Constructor
+
+    /**
+     * Creates a new {@link ServerStreamReader} from an existing {@link InputStream}
+     * @param in The input stream from the server.
+     * @param svrEventListener Will get called when there is a server event.
+     */
     @SuppressWarnings("unused")
     ServerStreamReader(InputStream in, EventListener svrEventListener) {
         this.in = in;
         this.svrEventListener = svrEventListener;
     }
 
+    /**
+     * Tell the {@link ServerStreamReader} to buffer the next response to a command.
+     * @param buffer The buffer to store the response in.
+     */
     @SuppressWarnings("unused")
-    public void bufferNextMessage(MessageBuffer buffer) {
-        bufferNextMessage(buffer, false);
+    public void bufferNextResponse(MessageBuffer buffer) {
+        bufferNextResponse(buffer, false);
     }
 
-    public void bufferNextMessage(MessageBuffer buffer, boolean isDataMessage) {
+    /**
+     * Tell the {@link ServerStreamReader} to buffer the next response to a command.
+     * @param buffer The buffer to store the response in.
+     * @param isDataResponse Set to true when the response contains data.
+     */
+    public void bufferNextResponse(MessageBuffer buffer, boolean isDataResponse) {
         this.messageBuffer = buffer;
 
-        this.bufferMessage = true;
-        this.isDataMessage = isDataMessage;
+        this.bufferResponse = true;
+        this.isDataResponse = isDataResponse;
         this.receivedOk = false;
     }
 
-    // Runnable method
+
+    //TODO: Check if can be made to executor service
+
+    /**
+     *
+     */
     @Override
     public void run() {
         StringBuilder sb = new StringBuilder();
         int data;
 
         while (true) {
-            try {
-                data = in.read();
-            }        // Read one integer from data stream.
-            catch (IOException e) {
-                break;
-            } // Exit loop when there is an IOException. (e.g. Data stream has been closed.)
+            try { data = in.read(); }        // Read one integer from data stream.
+            catch (IOException e) { break; } // Exit loop when there is an IOException. (e.g. Data stream has been closed.)
 
             if (data == -1) break;           // Exit loop if end of data stream has been reached.
 
-            char c = (char) data;             // Cast data (int) to char.
+            char c = (char) data;            // Cast data (int) to char.
 
             if (c != '\n') {                 // Check if end of line character has been reached.
                 sb.append(c);                // Append char to StringBuilder.
@@ -65,18 +80,18 @@ class ServerStreamReader implements Runnable {
     }
 
     private void handleMessage(String message) {
-        if (bufferMessage) {
-            if (isDataMessage) {
+        if (bufferResponse) {
+            if (isDataResponse) {
                 if (message.startsWith("ERR")) {
-                    isDataMessage = false;
-                    bufferMessage = false;
+                    isDataResponse = false;
+                    bufferResponse = false;
 
                     messageBuffer.setMessage(message);
                 } else if (message.startsWith("OK"))
-                    isDataMessage = false;
+                    isDataResponse = false;
                 receivedOk = true;
             } else if (message.startsWith("OK") || message.startsWith("ERR") || (message.startsWith("SVR") && receivedOk)) {
-                bufferMessage = false;
+                bufferResponse = false;
 
                 messageBuffer.setMessage(message);
             }

@@ -31,3 +31,4 @@ bin/
 # TODO: remove temporary
 ### temporary ###
 /server
+/javadoc
