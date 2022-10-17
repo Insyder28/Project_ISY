@@ -25,7 +25,7 @@ public class GameSocket {
      */
     public final Event onMatchEvent = new Event();
     /**
-     * Gets called when it is your turn in a game.
+     * Gets called when it is the players turn in a game.
      */
     public final Event onYourTurnEvent = new Event();
     /**
