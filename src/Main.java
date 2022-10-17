@@ -1,3 +1,5 @@
+import networking.GameSocket;
+
 public class Main {
     public static void main(String[] args) {
         GameSocket conn = new GameSocket();

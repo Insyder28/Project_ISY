@@ -1,3 +1,5 @@
+package events;
+
 /**
  * An interface that represents an event listener.
  */

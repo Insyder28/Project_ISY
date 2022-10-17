@@ -1,3 +1,7 @@
+package networking;
+
+import events.Event;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -27,6 +31,7 @@ public class GameSocket {
 
     // Methods
     //TODO: Handle other exceptions
+
     @SuppressWarnings("unused")
     public void connect(String hostName, int portNumber) throws FailedToConnectException {
         connect(hostName, portNumber, false);

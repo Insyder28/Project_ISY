@@ -1,5 +1,7 @@
+package networking;
+
 /**
- * A thread save buffer for messages
+ * A thread save buffer for messages.
  */
 public class MessageBuffer {
     String message;
