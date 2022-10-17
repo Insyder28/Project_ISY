@@ -6,7 +6,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-//TODO: Create wrappers for al synchronized objects https://stackoverflow.com/questions/32852464/how-to-avoid-synchronization-on-a-non-final-field
 
 /**
  * Represents a connection with a game server.
@@ -146,17 +145,13 @@ public class Connection {
     private String command(String command, boolean returnsData) throws ServerException {
         checkConnection();
 
-        StringBuffer serverResponseBuffer = new StringBuffer();
-        serverStreamReader.bufferNextMessage(serverResponseBuffer, returnsData);
+        MessageBuffer responseBuffer = new MessageBuffer();
+        serverStreamReader.bufferNextMessage(responseBuffer, returnsData);
         out.println(command);
 
-        synchronized (serverResponseBuffer) {
-            try {
-                serverResponseBuffer.wait();
-            } catch (InterruptedException ignored) { }
-        }
+        responseBuffer.awaitMessage();
 
-        String response = serverResponseBuffer.toString();
+        String response = responseBuffer.getMessage();
         if (response.startsWith("ERR ")) throw new ServerException(response.replace("ERR ", ""));
         return response;
     }
@@ -214,93 +209,6 @@ public class Connection {
     public static class DuplicateNameException extends Exception {
         public  DuplicateNameException(Throwable cause) {
             super("duplicate name exists", cause);
-        }
-    }
-}
-
-class ServerStreamReader implements Runnable {
-    private final InputStream in;
-    private final EventListener svrEventListener;
-
-    private StringBuffer messageBuffer;
-    private boolean bufferMessage;
-    private boolean isDataMessage;
-    private boolean receivedOk;
-
-    // Constructor
-    @SuppressWarnings("unused")
-    ServerStreamReader(InputStream in, EventListener svrEventListener) {
-        this.in = in;
-        this.svrEventListener = svrEventListener;
-    }
-
-    @SuppressWarnings("unused")
-    public void bufferNextMessage(StringBuffer buffer) {
-        bufferNextMessage(buffer, false);
-    }
-    public void bufferNextMessage(StringBuffer buffer, boolean isDataMessage) {
-        synchronized (buffer) {
-            this.messageBuffer = buffer;
-        }
-        this.bufferMessage = true;
-        this.isDataMessage = isDataMessage;
-        this.receivedOk = false;
-    }
-
-    // Runnable method
-    @Override
-    public void run() {
-        StringBuilder sb = new StringBuilder();
-        int data;
-
-        while (true) {
-            try { data = in.read(); }        // Read one integer from data stream.
-            catch (IOException e) { break; } // Exit loop when there is an IOException. (e.g. Data stream has been closed.)
-
-            if (data == -1) break;           // Exit loop if end of data stream has been reached.
-
-            char c = (char)data;             // Cast data (int) to char.
-
-            if (c != '\n') {                 // Check if end of line character has been reached.
-                sb.append(c);                // Append char to StringBuilder.
-                continue;
-            }
-
-            // End of line has been reached
-            String message = sb.toString();
-            handleMessage(message);
-            sb.setLength(0);
-        }
-    }
-
-    private void handleMessage(String message) {
-        if (bufferMessage) {
-            if (isDataMessage) {
-                if (message.startsWith("ERR")) {
-                    isDataMessage = false;
-                    bufferMessage = false;
-
-                    synchronized (messageBuffer) {
-                        messageBuffer.append(message);
-                        messageBuffer.notify();
-                    }
-                }
-                else if (message.startsWith("OK"))
-                    isDataMessage = false;
-                    receivedOk = true;
-            }
-            else if (message.startsWith("OK") || message.startsWith("ERR") || (message.startsWith("SVR") && receivedOk)) {
-                bufferMessage = false;
-
-                synchronized (messageBuffer) {
-                    messageBuffer.append(message);
-                    messageBuffer.notify();
-                }
-            }
-        }
-        else if (message.startsWith("SVR GAME ")) {
-            String event = message.replace("SVR ", "");
-            svrEventListener.onEvent(event);
         }
     }
 }
