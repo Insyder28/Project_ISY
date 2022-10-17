@@ -20,13 +20,42 @@ public class GameSocket {
     private PrintWriter out;
 
     // Server events
+    /**
+     * Gets called when a match is found.
+     */
     public final Event onMatchEvent = new Event();
+    /**
+     * Gets called when it is your turn in a game.
+     */
     public final Event onYourTurnEvent = new Event();
+    /**
+     * Gets called when receiving result of a move.
+     */
     public final Event onMoveEvent = new Event();
+    /**
+     * Gets called when receiving a challenge (invite) of another player.
+     */
     public final Event onChallengeEvent = new Event();
+    /**
+     * Gets called when a challenge (invite) of a player got cancelled. Can happen if a player:
+     * <ul>
+     *     <li>Accepted another challenge</li>
+     *     <li>Started another match</li>
+     *     <li>Lost connection</li>
+     * </ul>
+     */
     public final Event onChallengeCancelledEvent = new Event();
+    /**
+     * Gets called when player won current match.
+     */
     public final Event onWinEvent = new Event();
+    /**
+     * Gets called when player lost current match.
+     */
     public final Event onLossEvent = new Event();
+    /**
+     * Gets called when player has drawn current match.
+     */
     public final Event onDrawEvent = new Event();
 
     // Methods
