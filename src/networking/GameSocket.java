@@ -12,9 +12,9 @@ import java.net.Socket;
  * @author Erwin Veenhoven
  */
 public class GameSocket {
-    private Socket socket;
-    private ServerStreamReader serverStreamReader;
-    private PrintWriter out;
+    private final Socket socket;
+    private final ServerStreamReader serverStreamReader;
+    private final PrintWriter out;
 
     // Server events
     /**
@@ -55,33 +55,27 @@ public class GameSocket {
      */
     public final Event onDrawEvent = new Event();
 
-    // Methods
-    //TODO: Handle other exceptions
+    // Constructors
 
     @SuppressWarnings("unused")
-    public void connect(String hostName, int portNumber) throws FailedToConnectException {
-        connect(hostName, portNumber, false);
+    public GameSocket(String hostName, int portNumber) throws IOException {
+        this(hostName, portNumber, false);
     }
 
-    public void connect(String hostName, int portNumber, boolean autoDisconnect) throws FailedToConnectException {
-        try {
-            socket = new Socket(hostName, portNumber);
-            out = new PrintWriter(socket.getOutputStream(), true);
-            serverStreamReader = new ServerStreamReader(socket.getInputStream(), this::handleSvrEvent, autoDisconnect);
-
-            if (socket == null) throw new FailedToConnectException();
-        }
-        catch (IOException e) {
-            throw new FailedToConnectException(e);
-        }
+    public GameSocket(String hostName, int portNumber, boolean autoDisconnect) throws IOException {
+        socket = new Socket(hostName, portNumber);
+        out = new PrintWriter(socket.getOutputStream(), true);
+        serverStreamReader = new ServerStreamReader(socket.getInputStream(), this::handleSvrEvent, autoDisconnect);
     }
+
+    // Methods
 
     /**
      * Checks if the {@link GameSocket} still connected to a server.
      * @return true when connected to a server
      */
     @SuppressWarnings({"unused", "BooleanMethodIsAlwaysInverted"})
-    public boolean isConnected() {
+    public boolean isConnected() { //TODO: make similar to SocketObj.isConnected() and add isClosed method.
         if (socket == null) return false;
         if (socket.isClosed()) return false;
         return socket.isConnected();
@@ -91,7 +85,7 @@ public class GameSocket {
      * Disconnects the {@link GameSocket} from the server.
      */
     @SuppressWarnings("unused")
-    public void disconnect() {
+    public void close() {
         if (!isConnected()) return;
 
         out.println("disconnect");
@@ -251,18 +245,6 @@ public class GameSocket {
     public static class NotConnectedException extends RuntimeException {
         public NotConnectedException() {
             super("Not connected to a server.");
-        }
-    }
-
-    /**
-     * Gets thrown when {@link GameSocket} failed to connect.
-     */
-    public static class FailedToConnectException extends Exception {
-        public FailedToConnectException() {
-            super("Can't connect to the server.");
-        }
-        public FailedToConnectException(Throwable cause) {
-            super("Can't connect to the server.", cause);
         }
     }
 

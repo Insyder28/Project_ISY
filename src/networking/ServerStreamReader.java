@@ -32,10 +32,7 @@ public class ServerStreamReader {
      */
     @SuppressWarnings("unused")
     ServerStreamReader(InputStream in, EventListener svrEventListener) {
-        this.in = in;
-        this.svrEventListener = svrEventListener;
-
-        executor.execute(this::handleInputStreamLoop);
+        this(in, svrEventListener, false);
     }
 
     /**
