@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Wrapper for {@link InputStream} for handling server input.
@@ -24,7 +26,7 @@ public class ServerStreamReader {
 
 
     /**
-     * Creates a new {@link ServerStreamReader} from an existing {@link InputStream}
+     * Creates a new {@link ServerStreamReader} from an existing {@link InputStream}.
      * @param in The input stream from the server.
      * @param svrEventListener Will get called when there is a server event.
      */
@@ -34,6 +36,32 @@ public class ServerStreamReader {
         this.svrEventListener = svrEventListener;
 
         executor.execute(this::handleInputStreamLoop);
+    }
+
+    /**
+     * Creates a new {@link ServerStreamReader} from an existing {@link InputStream}.
+     * @param in The input stream from the server.
+     * @param svrEventListener Will get called when there is a server event.
+     * @param autoClose Calls {@link #close()} automatically when the thread from witch the constructor is called is terminated.
+     */
+    @SuppressWarnings("unused")
+    ServerStreamReader(InputStream in, EventListener svrEventListener, boolean autoClose) {
+        this.in = in;
+        this.svrEventListener = svrEventListener;
+
+        executor.execute(this::handleInputStreamLoop);
+
+
+        if (autoClose) {
+            Thread main = Thread.currentThread();
+            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+            executor.scheduleAtFixedRate(() -> {
+                if (!main.isAlive()) {
+                    close();
+                    executor.shutdown();
+                }
+            }, 0, 500, TimeUnit.MILLISECONDS);
+        }
     }
 
     /**

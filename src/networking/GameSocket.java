@@ -5,9 +5,6 @@ import events.Event;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -70,24 +67,11 @@ public class GameSocket {
         try {
             socket = new Socket(hostName, portNumber);
             out = new PrintWriter(socket.getOutputStream(), true);
-            serverStreamReader = new ServerStreamReader(socket.getInputStream(), this::handleSvrEvent);
+            serverStreamReader = new ServerStreamReader(socket.getInputStream(), this::handleSvrEvent, autoDisconnect);
 
             if (socket == null) throw new FailedToConnectException();
-
-            //TODO: put auto disconnect in separate method
-            if (autoDisconnect) {
-                Thread main = Thread.currentThread();
-
-                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-                executor.scheduleAtFixedRate(() -> {
-                    if (!main.isAlive()) {
-                        disconnect();
-                        executor.shutdown();
-                    }
-                }, 0, 500, TimeUnit.MILLISECONDS);
-            }
-
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new FailedToConnectException(e);
         }
     }
