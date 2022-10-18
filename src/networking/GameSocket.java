@@ -5,6 +5,9 @@ import events.Event;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -57,15 +60,39 @@ public class GameSocket {
 
     // Constructors
 
+    /**
+     * Creates a new {@link GameSocket} object and connects to a server.
+     * @param hostName the host name, or null for the loopback address.
+     * @param portNumber the port number.
+     * @throws IOException if an I/O error occurs when creating the object.
+     */
     @SuppressWarnings("unused")
     public GameSocket(String hostName, int portNumber) throws IOException {
         this(hostName, portNumber, false);
     }
 
-    public GameSocket(String hostName, int portNumber, boolean autoDisconnect) throws IOException {
+    /**
+     * Creates a new {@link GameSocket} object and connects to a server.
+     * @param hostName the host name, or null for the loopback address.
+     * @param portNumber the port number.
+     * @param autoClose Automatically calls {@link #close()} on object when thread from witch constructor was called is terminated.
+     * @throws IOException if an I/O error occurs when creating the object.
+     */
+    public GameSocket(String hostName, int portNumber, boolean autoClose) throws IOException {
         socket = new Socket(hostName, portNumber);
         out = new PrintWriter(socket.getOutputStream(), true);
-        serverStreamReader = new ServerStreamReader(socket.getInputStream(), this::handleSvrEvent, autoDisconnect);
+        serverStreamReader = new ServerStreamReader(socket.getInputStream(), this::handleSvrEvent);
+
+        if (autoClose) {
+            Thread main = Thread.currentThread();
+            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+            executor.scheduleAtFixedRate(() -> {
+                if (!main.isAlive()) {
+                    close();
+                    executor.shutdown();
+                }
+            }, 0, 500, TimeUnit.MILLISECONDS);
+        }
     }
 
     // Methods
@@ -189,7 +216,7 @@ public class GameSocket {
         return s.substring(1, s.length() - 2).replace("\"", "").split(", ");
     }
 
-    public String command(String command, boolean returnsData) throws ServerException {
+    private String command(String command, boolean returnsData) throws ServerException {
         MessageBuffer responseBuffer = new MessageBuffer();
         serverStreamReader.bufferNextResponse(responseBuffer, returnsData);
         out.println(command);
