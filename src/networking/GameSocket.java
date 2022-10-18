@@ -71,23 +71,10 @@ public class GameSocket {
     // Methods
 
     /**
-     * Checks if the {@link GameSocket} still connected to a server.
-     * @return true when connected to a server
-     */
-    @SuppressWarnings({"unused", "BooleanMethodIsAlwaysInverted"})
-    public boolean isConnected() { //TODO: make similar to SocketObj.isConnected() and add isClosed method.
-        if (socket == null) return false;
-        if (socket.isClosed()) return false;
-        return socket.isConnected();
-    }
-
-    /**
      * Disconnects the {@link GameSocket} from the server.
      */
     @SuppressWarnings("unused")
     public void close() {
-        if (!isConnected()) return;
-
         out.println("disconnect");
 
         try {
@@ -202,9 +189,7 @@ public class GameSocket {
         return s.substring(1, s.length() - 2).replace("\"", "").split(", ");
     }
 
-    private String command(String command, boolean returnsData) throws ServerException {
-        checkConnection();
-
+    public String command(String command, boolean returnsData) throws ServerException {
         MessageBuffer responseBuffer = new MessageBuffer();
         serverStreamReader.bufferNextResponse(responseBuffer, returnsData);
         out.println(command);
@@ -235,19 +220,6 @@ public class GameSocket {
     }
 
     // Error & Exception stuff
-    private void checkConnection() throws NotConnectedException {
-        if (!isConnected()) throw new NotConnectedException();
-    }
-
-    /**
-     * Gets thrown when there is no connection when a connection is needed.
-     */
-    public static class NotConnectedException extends RuntimeException {
-        public NotConnectedException() {
-            super("Not connected to a server.");
-        }
-    }
-
     /**
      * Gets thrown when there is a server error/exception.
      */
