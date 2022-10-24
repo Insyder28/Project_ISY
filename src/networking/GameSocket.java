@@ -75,11 +75,19 @@ public class GameSocket implements Closeable {
 
     // Getters and Setters
 
+    /**
+     *
+     * @param serverTimeOutDelay
+     */
     @SuppressWarnings("unused")
     public void setServerTimeOutDelay(int serverTimeOutDelay) {
         this.serverTimeOutDelay = serverTimeOutDelay;
     }
 
+    /**
+     *
+     * @return
+     */
     @SuppressWarnings("unused")
     public int getServerTimeOutDelay() {
         return serverTimeOutDelay;
@@ -211,6 +219,7 @@ public class GameSocket implements Closeable {
         serverStreamReader.bufferNextResponse(responseBuffer, returnsData);
         out.println(command);
 
+        //TODO: refactor serverTimeOutDelay check
         if (serverTimeOutDelay > 0) {
             try {
                 responseBuffer.awaitMessage(serverTimeOutDelay);
