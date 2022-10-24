@@ -19,6 +19,8 @@ public class GameSocket {
     private final ServerStreamReader serverStreamReader;
     private final PrintWriter out;
 
+    private int serverTimeOutDelay = 2;
+
     // Server events
     /**
      * Gets called when a match is found.
@@ -93,6 +95,18 @@ public class GameSocket {
                 }
             }, 0, 500, TimeUnit.MILLISECONDS);
         }
+    }
+
+    // Getters and Setters
+
+    @SuppressWarnings("unused")
+    public void setServerTimeOutDelay(int serverTimeOutDelay) {
+        this.serverTimeOutDelay = serverTimeOutDelay;
+    }
+
+    @SuppressWarnings("unused")
+    public int getServerTimeOutDelay() {
+        return serverTimeOutDelay;
     }
 
     // Methods
@@ -221,7 +235,15 @@ public class GameSocket {
         serverStreamReader.bufferNextResponse(responseBuffer, returnsData);
         out.println(command);
 
-        responseBuffer.awaitMessage();
+        if (serverTimeOutDelay > 0) {
+            try {
+                responseBuffer.awaitMessage(serverTimeOutDelay);
+            }
+            catch (MessageBuffer.TimedOutException e) {
+                throw new ServerTimedOutException();
+            }
+        }
+        else responseBuffer.awaitMessage();
 
         String response = responseBuffer.getMessage();
         if (response.startsWith("ERR ")) throw new ServerException(response.replace("ERR ", ""));
@@ -253,6 +275,16 @@ public class GameSocket {
     public static class ServerException extends RuntimeException {
         public ServerException(String errorMessage) {
             super(errorMessage);
+        }
+    }
+
+    /**
+     * <p>Gets thrown when the server timed out. (e.g. Server reaction to command took too long.)</p>
+     * <p>Note: To change the delay until {@link ServerTimedOutException} is thrown use {@link #setServerTimeOutDelay(int)}.</p>
+     */
+    public static class ServerTimedOutException extends ServerException {
+        public ServerTimedOutException() {
+            super("server timed out");
         }
     }
 
