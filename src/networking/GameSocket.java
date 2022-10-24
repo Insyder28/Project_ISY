@@ -19,7 +19,7 @@ public class GameSocket {
     private final ServerStreamReader serverStreamReader;
     private final PrintWriter out;
 
-    private int serverTimeOutDelay = 2;
+    private int serverTimeOutDelay = 1000;
 
     // Server events
     /**
@@ -85,6 +85,7 @@ public class GameSocket {
         out = new PrintWriter(socket.getOutputStream(), true);
         serverStreamReader = new ServerStreamReader(socket.getInputStream(), this::handleSvrEvent);
 
+        // Enable auto-close
         if (autoClose) {
             Thread main = Thread.currentThread();
             ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -208,7 +209,7 @@ public class GameSocket {
      * @throws ServerException gets thrown when a server error occurs while trying to forfeit
      */
     @SuppressWarnings("unused")
-    public void forfeit() throws ServerException{
+    public void forfeit() throws ServerException {
         command("forfeit", false);
     }
 
