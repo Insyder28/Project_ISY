@@ -2,6 +2,7 @@ package networking;
 
 import events.EventListener;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
@@ -11,7 +12,7 @@ import java.util.concurrent.Executors;
  * Wrapper for {@link InputStream} for handling server input.
  * @author Erwin Veenhoven
  */
-public class ServerStreamReader {
+public class ServerStreamReader implements Closeable {
     private final InputStream in;
     private final EventListener svrEventListener;
 
