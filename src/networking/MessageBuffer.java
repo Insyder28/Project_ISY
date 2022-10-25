@@ -54,6 +54,9 @@ public class MessageBuffer {
         return message;
     }
 
+    /**
+     * Gets thrown when a response times out.
+     */
     public static class TimedOutException extends Exception {
         public TimedOutException() {
             super("awaitMessage timed out");
