@@ -237,14 +237,14 @@ public class GameSocket implements Closeable {
         serverStreamReader.bufferNextResponse(responseBuffer, returnsData);
         out.println(command);
 
+        String response;
         try {
-            responseBuffer.awaitMessage(serverTimeOutDelay);
+            response = responseBuffer.awaitMessage(serverTimeOutDelay);
         }
         catch (MessageBuffer.TimedOutException e) {
             throw new ServerTimedOutException(e);
         }
 
-        String response = responseBuffer.getMessage();
         if (response.startsWith("ERR ")) throw new ServerException(response.replace("ERR ", ""));
         return response;
     }

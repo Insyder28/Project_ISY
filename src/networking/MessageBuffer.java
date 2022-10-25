@@ -5,7 +5,7 @@ package networking;
  */
 public class MessageBuffer {
     String message;
-    private volatile boolean interruptedWait = false;
+    private volatile boolean notified = false;
 
     /**
      * Set a message and call {@link #notify()} on object in a thread safe manner.
@@ -13,12 +13,14 @@ public class MessageBuffer {
      */
     synchronized public void setMessage(String message) {
         this.message = message;
+        this.notified = true;
         this.notify();
     }
 
     /**
      * @return current message stored in buffer.
      */
+    @SuppressWarnings("unused")
     synchronized public String getMessage() {
         return message;
     }
@@ -27,9 +29,10 @@ public class MessageBuffer {
      * Calls {@link #wait()} on object in a thread safe manner.
      * @see #setMessage(String)
      */
-    synchronized public void awaitMessage() {
+    synchronized public String awaitMessage() {
         try { this.wait(); }
         catch (InterruptedException ignored) { }
+        return message;
     }
 
     /**
@@ -37,30 +40,18 @@ public class MessageBuffer {
      * @param timeOutDelay the time after witch the waiting times out.
      * @throws TimedOutException Gets thrown when waiting longer than the timeOutDelay.
      */
-    synchronized public void awaitMessage(int timeOutDelay) throws TimedOutException{
+    synchronized public String awaitMessage(int timeOutDelay) throws TimedOutException{
         if (timeOutDelay <= 0) {
-            awaitMessage();
-            return;
+            return awaitMessage();
         }
 
-        try {
-            Thread timer = new Thread(() -> {
-                try {
-                    Thread.sleep(timeOutDelay);
-                    this.interruptedWait = true;
-                    synchronized (this) {
-                        this.notify();
-                    }
-                }
-                catch (InterruptedException ignored) { }
-            });
+        this.notified = false;
 
-            timer.start();
-            this.wait();
-            if (interruptedWait) throw new TimedOutException();
-            else timer.interrupt();
-        }
+        try { this.wait(timeOutDelay); }
         catch (InterruptedException ignored) { }
+
+        if (!notified) throw new TimedOutException();
+        return message;
     }
 
     public static class TimedOutException extends Exception {
