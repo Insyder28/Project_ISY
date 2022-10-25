@@ -9,8 +9,11 @@ public class Main {
         try { gameSocket = new GameSocket("localhost", 7789); }
         catch (IOException e) { throw new RuntimeException(e); }
 
-        String[] games = gameSocket.getGameList();
-        for (var game : games) System.out.println(game);
+        try {
+            String[] games = gameSocket.getGameList();
+            for (var game : games) System.out.println(game);
+        }
+        catch (GameSocket.ServerException ignored) { }
 
         gameSocket.close();
     }

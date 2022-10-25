@@ -76,8 +76,10 @@ public class GameSocket implements Closeable {
     // Getters and Setters
 
     /**
-     *
-     * @param serverTimeOutDelay
+     * <p>Setter for ServerTimeOutDelay.</p>
+     * <p>Note: When the delay is 0 it will never time out.</p>
+     * @param serverTimeOutDelay the delay until server times out after command.
+     * @see #getServerTimeOutDelay()
      */
     @SuppressWarnings("unused")
     public void setServerTimeOutDelay(int serverTimeOutDelay) {
@@ -85,8 +87,9 @@ public class GameSocket implements Closeable {
     }
 
     /**
-     *
-     * @return
+     * Getter for serverTimeOutDelay.
+     * @return the current serverTimeOutDelay.
+     * @see #setServerTimeOutDelay(int)
      */
     @SuppressWarnings("unused")
     public int getServerTimeOutDelay() {
@@ -112,32 +115,41 @@ public class GameSocket implements Closeable {
     /**
      * Logs player in on server.
      * @param playerName name of the player
-     * @throws DuplicateNameException gets thrown when name is already in use by somebody else
+     * @throws ServerException if a server exception/error occurs.
+     * @throws ServerTimedOutException if the server times out.
+     * @throws DuplicateNameException if name is already in use by somebody else.
      */
     @SuppressWarnings("unused")
-    public void login(String playerName) throws DuplicateNameException {
+    public void login(String playerName) throws ServerException {
         try {
             command("login " + playerName, false);
         }
         catch (ServerException e) {
             if (e.getMessage().equals("duplicate name exists")) throw new DuplicateNameException(e);
+            else throw e;
         }
     }
 
     /**
+     * Retrieves all available games on the server.
      * @return available games on the server
+     * @throws ServerException if a server exception/error occurs.
+     * @throws ServerTimedOutException if the server times out.
      */
     @SuppressWarnings("unused")
-    public String[] getGameList() {
+    public String[] getGameList() throws ServerException {
         String response = command("get gamelist", true);
         return toArray(response.split(" ", 3)[2]);
     }
 
     /**
-     * @return currently logged in players on the server
+     * Retrieves all currently logged in players on the server.
+     * @return currently logged in players on the server.
+     * @throws ServerException if a server exception/error occurs.
+     * @throws ServerTimedOutException if the server times out.
      */
     @SuppressWarnings("unused")
-    public String[] getPlayerList() {
+    public String[] getPlayerList() throws ServerException {
         String response = command("get playerlist", true);
         return toArray(response.split(" ", 3)[2]);
     }
@@ -146,6 +158,7 @@ public class GameSocket implements Closeable {
      * Sign up for playing a specific game with someone.
      * @param gameType the game to sign up for
      * @throws ServerException gets thrown when a server error occurs while trying to subscribe to a game
+     * @throws ServerTimedOutException if the server times out.
      */
     @SuppressWarnings("unused")
     public void subscribe(String gameType) throws ServerException {
@@ -156,6 +169,7 @@ public class GameSocket implements Closeable {
      * Submits a game move to the server.
      * @param pos the board position from top left to bottom right
      * @throws ServerException gets thrown when a server error occurs while trying to make a move
+     * @throws ServerTimedOutException if the server times out.
      */
     @SuppressWarnings("unused")
     public void move(int pos) throws ServerException {
@@ -167,6 +181,7 @@ public class GameSocket implements Closeable {
      * @param playerName name of player to challenge
      * @param gameType the game to play
      * @throws ServerException gets thrown when a server error occurs while trying to challenge another player
+     * @throws ServerTimedOutException if the server times out.
      */
     @SuppressWarnings("unused")
     public void challenge(String playerName, String gameType) throws ServerException {
@@ -181,6 +196,7 @@ public class GameSocket implements Closeable {
      * Accept a challenge (invite) from a player.
      * @param challengeId ID of the challenge
      * @throws ServerException gets thrown when a server error occurs while trying to accept a challenge
+     * @throws ServerTimedOutException if the server times out.
      */
     @SuppressWarnings("unused")
     public void challengeAccept(int challengeId) throws ServerException {
@@ -190,6 +206,7 @@ public class GameSocket implements Closeable {
     /**
      * Forfeit the current match.
      * @throws ServerException gets thrown when a server error occurs while trying to forfeit
+     * @throws ServerTimedOutException if the server times out.
      */
     @SuppressWarnings("unused")
     public void forfeit() throws ServerException {
@@ -200,6 +217,7 @@ public class GameSocket implements Closeable {
      * Send message to other players.
      * @param text text to send
      * @throws ServerException gets thrown when a server error occurs while trying to send a message
+     * @throws ServerTimedOutException if the server times out.
      */
     @SuppressWarnings("unused")
     public void message(String text) throws ServerException {
@@ -219,16 +237,12 @@ public class GameSocket implements Closeable {
         serverStreamReader.bufferNextResponse(responseBuffer, returnsData);
         out.println(command);
 
-        //TODO: refactor serverTimeOutDelay check
-        if (serverTimeOutDelay > 0) {
-            try {
-                responseBuffer.awaitMessage(serverTimeOutDelay);
-            }
-            catch (MessageBuffer.TimedOutException e) {
-                throw new ServerTimedOutException();
-            }
+        try {
+            responseBuffer.awaitMessage(serverTimeOutDelay);
         }
-        else responseBuffer.awaitMessage();
+        catch (MessageBuffer.TimedOutException e) {
+            throw new ServerTimedOutException(e);
+        }
 
         String response = responseBuffer.getMessage();
         if (response.startsWith("ERR ")) throw new ServerException(response.replace("ERR ", ""));
@@ -257,26 +271,29 @@ public class GameSocket implements Closeable {
     /**
      * Gets thrown when there is a server error/exception.
      */
-    public static class ServerException extends RuntimeException {
+    public static class ServerException extends Exception {
         public ServerException(String errorMessage) {
             super(errorMessage);
+        }
+        public ServerException(String errorMessage, Throwable cause) {
+            super(errorMessage, cause);
         }
     }
 
     /**
      * <p>Gets thrown when the server timed out. (e.g. Server reaction to command took too long.)</p>
-     * <p>Note: To change the delay until {@link ServerTimedOutException} is thrown use {@link #setServerTimeOutDelay(int)}.</p>
+     * <p>Note: To change the delay until it is thrown use {@link #setServerTimeOutDelay(int)}.</p>
      */
     public static class ServerTimedOutException extends ServerException {
-        public ServerTimedOutException() {
-            super("server timed out");
+        public ServerTimedOutException(Throwable cause) {
+            super("server timed out", cause);
         }
     }
 
     /**
      * Gets thrown when there is a duplicate name.
      */
-    public static class DuplicateNameException extends Exception {
+    public static class DuplicateNameException extends ServerException {
         public  DuplicateNameException(Throwable cause) {
             super("duplicate name exists", cause);
         }

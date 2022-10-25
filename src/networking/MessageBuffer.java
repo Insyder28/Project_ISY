@@ -24,7 +24,7 @@ public class MessageBuffer {
     }
 
     /**
-     * calls {@link #wait()} on object in a thread safe manner.
+     * Calls {@link #wait()} on object in a thread safe manner.
      * @see #setMessage(String)
      */
     synchronized public void awaitMessage() {
@@ -33,11 +33,16 @@ public class MessageBuffer {
     }
 
     /**
-     *
-     * @param timeOutDelay
-     * @throws TimedOutException
+     * Calls {@link #wait()} on object in a thread safe manner.
+     * @param timeOutDelay the time after witch the waiting times out.
+     * @throws TimedOutException Gets thrown when waiting longer than the timeOutDelay.
      */
     synchronized public void awaitMessage(int timeOutDelay) throws TimedOutException{
+        if (timeOutDelay <= 0) {
+            awaitMessage();
+            return;
+        }
+
         try {
             Thread timer = new Thread(() -> {
                 try {
