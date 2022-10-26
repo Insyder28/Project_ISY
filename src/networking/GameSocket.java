@@ -250,20 +250,33 @@ public class GameSocket implements Closeable {
     }
 
     private void handleSvrEvent(String message) {
-        String[] a = message.split(" ", 2);
-        String type = a[0];
-        String args = a[1];
+        String[] a = message.split(" ", 3);
+        String type = a[1];
+        String args = a[2];
 
         switch (type) {
-            case "MATCH": onMatchEvent.call(args);
-            case "YOURTURN": onYourTurnEvent.call(args);
-            case "MOVE": onMoveEvent.call(args);
-            case "WIN": onWinEvent.call(args);
-            case "LOSS": onLossEvent.call(args);
-            case "DRAW": onDrawEvent.call(args);
+            case "MATCH":
+                onMatchEvent.call(args);
+                break;
+            case "YOURTURN":
+                onYourTurnEvent.call(args);
+                break;
+            case "MOVE":
+                onMoveEvent.call(args);
+                break;
+            case "WIN":
+                onWinEvent.call(args);
+                break;
+            case "LOSS":
+                onLossEvent.call(args);
+                break;
+            case "DRAW":
+                onDrawEvent.call(args);
+                break;
             case "CHALLENGE":
                 if (args.startsWith("CANCELLED")) onChallengeCancelledEvent.call(args.split(" ", 2)[1]);
                 else onChallengeEvent.call(args);
+                break;
         }
     }
 
