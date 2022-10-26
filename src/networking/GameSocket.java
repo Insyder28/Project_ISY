@@ -255,28 +255,16 @@ public class GameSocket implements Closeable {
         String args = a[2];
 
         switch (type) {
-            case "MATCH":
-                onMatchEvent.call(args);
-                break;
-            case "YOURTURN":
-                onYourTurnEvent.call(args);
-                break;
-            case "MOVE":
-                onMoveEvent.call(args);
-                break;
-            case "WIN":
-                onWinEvent.call(args);
-                break;
-            case "LOSS":
-                onLossEvent.call(args);
-                break;
-            case "DRAW":
-                onDrawEvent.call(args);
-                break;
-            case "CHALLENGE":
+            case "MATCH" -> onMatchEvent.call(args);
+            case "YOURTURN" -> onYourTurnEvent.call(args);
+            case "MOVE" -> onMoveEvent.call(args);
+            case "WIN" -> onWinEvent.call(args);
+            case "LOSS" -> onLossEvent.call(args);
+            case "DRAW" -> onDrawEvent.call(args);
+            case "CHALLENGE" -> {
                 if (args.startsWith("CANCELLED")) onChallengeCancelledEvent.call(args.split(" ", 2)[1]);
                 else onChallengeEvent.call(args);
-                break;
+            }
         }
     }
 
