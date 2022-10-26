@@ -19,8 +19,8 @@ public class ServerStreamReader implements Closeable {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private MessageBuffer messageBuffer;
-    private boolean bufferResponse;
-    private boolean isDataResponse;
+    private volatile boolean bufferResponse;
+    private volatile boolean isDataResponse;
     private boolean receivedOk;
 
 
@@ -96,8 +96,14 @@ public class ServerStreamReader implements Closeable {
         executor.shutdown();
     }
 
+    //TODO: fix mixed messages
     private void handleMessage(String message) {
-        if (bufferResponse) {
+        if (message.startsWith("SVR GAME ")) {
+            String event = message.replace("SVR ", "");
+            svrEventListener.onEvent(event);
+        }
+
+        else if (bufferResponse) {
             if (isDataResponse) {
                 if (message.startsWith("ERR")) {
                     isDataResponse = false;
@@ -110,13 +116,9 @@ public class ServerStreamReader implements Closeable {
                 }
             }
             else if (message.startsWith("OK") || message.startsWith("ERR") || (message.startsWith("SVR") && receivedOk)) {
-                bufferResponse = false;
                 messageBuffer.setMessage(message);
+                bufferResponse = false;
             }
-        }
-        else if (message.startsWith("SVR GAME ")) {
-            String event = message.replace("SVR ", "");
-            svrEventListener.onEvent(event);
         }
     }
 }
