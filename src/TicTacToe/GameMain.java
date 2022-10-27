@@ -1,7 +1,6 @@
 package TicTacToe;
 import java.util.Scanner;
 /**Author: Hindrik Kroes
- *
  * The main class for the Tic-Tac-Toe
  * It acts as the overall controller of the game.
  */
@@ -14,7 +13,7 @@ public class GameMain {
     /** The current player (of enum Seed) */
     private Seed  currentPlayer;
 
-    private static Scanner input = new Scanner(System.in);
+    private final static Scanner input = new Scanner(System.in);
 
     /** Constructor to set up the game */
     public GameMain() {
