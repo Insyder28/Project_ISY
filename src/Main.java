@@ -3,8 +3,8 @@ import players.HumanPlayer;
 
 public class Main {
     public static void main(String[] args) {
-        TicTacToe ticTacToe = new TicTacToe(new HumanPlayer(), new HumanPlayer());
+        TicTacToe ticTacToe = new TicTacToe();
 
-        ticTacToe.startGame();
+        ticTacToe.startLocalGame(new HumanPlayer(), new HumanPlayer());
     }
 }

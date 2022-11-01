@@ -1,24 +1,25 @@
 package games;
 
+import networking.GameSocket;
 import players.Player;
 
 public class TicTacToe {
-    private final Player[] players = new Player[2];
-    private final Board board = new Board(3, 3);
+    private Player[] players = new Player[2];
+    private Board board = new Board(3, 3);
 
-    public TicTacToe (Player xPlayer, Player oPlayer) {
+    public void startLocalGame(Player xPlayer, Player oPlayer) {
+        // Setup
         players[0] = xPlayer;
         xPlayer.setIcon(Icon.CROSS);
 
         players[1] = oPlayer;
         oPlayer.setIcon(Icon.NOUGHT);
-    }
 
-    public void startGame() {
         boolean loop = true;
         Player winner = null;
         int counter = 0;
 
+        // Start game
         while (loop) {
             for (Player player : players) {
                 // Check if board is full
@@ -32,8 +33,8 @@ public class TicTacToe {
 
                 // Validate
                 if (!validateMove(pos)) {
-                    if (players[0] == player) winner = players[1];
-                    else winner = players[0];
+                    if (player.getIcon() == Icon.CROSS) winner = players[1];
+                    else winner = player;
 
                     loop = false;
                     break;
@@ -62,6 +63,10 @@ public class TicTacToe {
 
         System.out.println("\nWinner is: '" + winner.getIcon() + "'");
         System.out.println(board);
+    }
+
+    public void startOnlineGame(Player player) {
+        // ...
     }
 
     private boolean validateMove(int pos) {
