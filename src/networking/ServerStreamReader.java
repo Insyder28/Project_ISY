@@ -69,7 +69,6 @@ public class ServerStreamReader implements Closeable {
         executor.shutdownNow();
     }
 
-
     private void handleInputStreamLoop() {
         StringBuilder sb = new StringBuilder();
         int data;

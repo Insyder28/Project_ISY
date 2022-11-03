@@ -133,84 +133,140 @@ public class GameSocket implements Closeable {
     /**
      * Retrieves all available games on the server.
      * @return available games on the server
-     * @throws ServerException if a server exception/error occurs.
      * @throws ServerTimedOutException if the server times out.
+     * @throws ServerRuntimeException gets thrown when a server error occurs while trying to subscribe to a game.
      */
     @SuppressWarnings("unused")
-    public String[] getGameList() throws ServerException {
-        String response = command("get gamelist", true);
-        return toArray(response.split(" ", 3)[2]);
+    public String[] getGameList() throws ServerTimedOutException {
+        try {
+            String response = command("get gamelist", true);
+            return toArray(response.split(" ", 3)[2]);
+        }
+        catch (ServerTimedOutException e) {
+            throw e;
+        }
+        catch (ServerException e) {
+            throw new ServerRuntimeException(e);
+        }
     }
 
     /**
      * Retrieves all currently logged in players on the server.
      * @return currently logged in players on the server.
-     * @throws ServerException if a server exception/error occurs.
      * @throws ServerTimedOutException if the server times out.
+     * @throws ServerRuntimeException gets thrown when a server error occurs while trying to subscribe to a game.
      */
     @SuppressWarnings("unused")
-    public String[] getPlayerList() throws ServerException {
-        String response = command("get playerlist", true);
-        return toArray(response.split(" ", 3)[2]);
+    public String[] getPlayerList() throws ServerTimedOutException {
+        try {
+            String response = command("get playerlist", true);
+            return toArray(response.split(" ", 3)[2]);
+        }
+        catch (ServerTimedOutException e) {
+            throw e;
+        }
+        catch (ServerException e) {
+            throw new ServerRuntimeException(e);
+        }
     }
 
     /**
      * Sign up for playing a specific game with someone.
      * @param gameType the game to sign up for
-     * @throws ServerException gets thrown when a server error occurs while trying to subscribe to a game
      * @throws ServerTimedOutException if the server times out.
+     * @throws ServerRuntimeException gets thrown when a server error occurs while trying to subscribe to a game.
      */
     @SuppressWarnings("unused")
-    public void subscribe(String gameType) throws ServerException {
-        command("subscribe " + gameType, false);
+    public void subscribe(String gameType) throws ServerTimedOutException {
+        try {
+            command("subscribe " + gameType, false);
+        }
+        catch (ServerTimedOutException e) {
+            throw e;
+        }
+        catch (ServerException e) {
+            throw new ServerRuntimeException(e);
+        }
     }
 
     /**
      * Submits a game move to the server.
      * @param pos the board position from top left to bottom right
-     * @throws ServerException gets thrown when a server error occurs while trying to make a move
      * @throws ServerTimedOutException if the server times out.
+     * @throws ServerRuntimeException gets thrown when a server error occurs while trying to subscribe to a game.
      */
     @SuppressWarnings("unused")
-    public void move(int pos) throws ServerException {
-        command("move " + pos, false);
+    public void move(int pos) throws ServerTimedOutException {
+        try {
+            command("move " + pos, false);
+        }
+        catch (ServerTimedOutException e) {
+            throw e;
+        }
+        catch (ServerException e) {
+            throw new ServerRuntimeException(e);
+        }
     }
 
     /**
      * Create a challenge (invite) to play with another player.
      * @param playerName name of player to challenge
      * @param gameType the game to play
-     * @throws ServerException gets thrown when a server error occurs while trying to challenge another player
      * @throws ServerTimedOutException if the server times out.
+     * @throws ServerRuntimeException gets thrown when a server error occurs while trying to subscribe to a game.
      */
     @SuppressWarnings("unused")
-    public void challenge(String playerName, String gameType) throws ServerException {
-        String name;
-        if (playerName.contains(" ")) name = '"' + playerName + '"';
-        else name = playerName;
+    public void challenge(String playerName, String gameType) throws ServerTimedOutException {
+        try {
+            String name;
+            if (playerName.contains(" ")) name = '"' + playerName + '"';
+            else name = playerName;
 
-        command("challenge " + name + " " + gameType, false);
+            command("challenge " + name + " " + gameType, false);
+        }
+        catch (ServerTimedOutException e) {
+            throw e;
+        }
+        catch (ServerException e) {
+            throw new ServerRuntimeException(e);
+        }
     }
 
     /**
      * Accept a challenge (invite) from a player.
      * @param challengeId ID of the challenge
-     * @throws ServerException gets thrown when a server error occurs while trying to accept a challenge
      * @throws ServerTimedOutException if the server times out.
+     * @throws ServerRuntimeException gets thrown when a server error occurs while trying to subscribe to a game.
      */
     @SuppressWarnings("unused")
-    public void challengeAccept(int challengeId) throws ServerException {
-        command("challenge accept " + challengeId, false);
+    public void challengeAccept(int challengeId) throws ServerTimedOutException {
+        try {
+            command("challenge accept " + challengeId, false);
+        }
+        catch (ServerTimedOutException e) {
+            throw e;
+        }
+        catch (ServerException e) {
+            throw new ServerRuntimeException(e);
+        }
     }
 
     /**
      * Forfeit the current match.
-     * @throws ServerException gets thrown when a server error occurs while trying to forfeit
      * @throws ServerTimedOutException if the server times out.
+     * @throws ServerRuntimeException gets thrown when a server error occurs while trying to subscribe to a game.
      */
     @SuppressWarnings("unused")
-    public void forfeit() throws ServerException {
-        command("forfeit", false);
+    public void forfeit() throws ServerTimedOutException {
+        try {
+            command("forfeit", false);
+        }
+        catch (ServerTimedOutException e) {
+            throw e;
+        }
+        catch (ServerException e) {
+            throw new ServerRuntimeException(e);
+        }
     }
 
     /**
