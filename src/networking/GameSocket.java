@@ -267,36 +267,4 @@ public class GameSocket implements Closeable {
             }
         }
     }
-
-    // Error & Exception stuff
-    /**
-     * Gets thrown when there is a server error/exception.
-     */
-    public static class ServerException extends Exception {
-        public ServerException(String errorMessage) {
-            super(errorMessage);
-        }
-        public ServerException(String errorMessage, Throwable cause) {
-            super(errorMessage, cause);
-        }
-    }
-
-    /**
-     * <p>Gets thrown when the server timed out. (e.g. Server reaction to command took too long.)</p>
-     * <p>Note: To change the delay until it is thrown use {@link #setServerTimeOutDelay(int)}.</p>
-     */
-    public static class ServerTimedOutException extends ServerException {
-        public ServerTimedOutException(Throwable cause) {
-            super("server timed out", cause);
-        }
-    }
-
-    /**
-     * Gets thrown when there is a duplicate name.
-     */
-    public static class DuplicateNameException extends ServerException {
-        public  DuplicateNameException(Throwable cause) {
-            super("duplicate name exists", cause);
-        }
-    }
 }

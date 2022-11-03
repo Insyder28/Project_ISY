@@ -32,3 +32,4 @@ bin/
 ### temporary ###
 /server
 /javadoc
+/ignored
