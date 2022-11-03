@@ -1,4 +1,5 @@
 import networking.GameSocket;
+import networking.ServerException;
 
 import java.io.IOException;
 
@@ -13,7 +14,7 @@ public class Main {
             String[] games = gameSocket.getGameList();
             for (var game : games) System.out.println(game);
         }
-        catch (GameSocket.ServerException ignored) { }
+        catch (ServerException ignored) { }
 
         gameSocket.close();
     }
