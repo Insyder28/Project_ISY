@@ -29,6 +29,7 @@ public class TicTacToe {
                 }
 
                 // Get move from player
+                System.out.println("\n" + player.getIcon() + "'s turn\n" + board);
                 int pos = player.move(board);
 
                 // Validate

@@ -19,8 +19,6 @@ public class HumanPlayer implements Player {
     public int move(Board board) {
         Scanner input = new Scanner(System.in);
 
-        System.out.println(board);
-
         while (true) {
             System.out.print("\nPlayer '" + icon + "', enter your move (column[1-3] row[1-3]): ");
             int col = input.nextInt() - 1;   // [0-2]
