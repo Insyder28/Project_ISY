@@ -18,6 +18,7 @@ public class GameSocket implements Closeable {
     private final PrintWriter out;
 
     private int serverTimeOutDelay = 1000;
+    private boolean loggedIn = false;
 
     // Server events
     /**
@@ -96,6 +97,14 @@ public class GameSocket implements Closeable {
         return serverTimeOutDelay;
     }
 
+    /**
+     * @return true if player is logged in.
+     */
+    @SuppressWarnings("unused")
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
+
     // Methods
 
     /**
@@ -123,6 +132,7 @@ public class GameSocket implements Closeable {
     public void login(String playerName) throws ServerException {
         try {
             command("login " + playerName, false);
+            loggedIn = true;
         }
         catch (ServerException e) {
             if (e.getMessage().equals("duplicate name exists")) throw new DuplicateNameException(e);
