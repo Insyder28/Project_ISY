@@ -106,6 +106,8 @@ public class TicTacToeOnline {
     }
 
     private void onMove(String args) {
+        count++;
+
         Map<String, String> data = toMap(args);
         boolean ownMove = data.get("PLAYER").equals(gameSocket.getPlayerName());
 
@@ -122,22 +124,20 @@ public class TicTacToeOnline {
                 receivedOpponentMove.notify();
             }
         }
-
-        count++;
     }
 
     private void onLoss(String args) {
-        System.out.println("\nonLoss: " + args);
+        System.out.println("\nYou lost\n" + board);
         endGame();
     }
 
     private void onWin(String args) {
-        System.out.println("\nonWin: " + args);
+        System.out.println("\nYou won!\n" + board);
         endGame();
     }
 
     private void onDraw(String args) {
-        System.out.println("\nonDraw: " + args);
+        System.out.println("\nIt's a draw!\n" + board);
         endGame();
     }
 
