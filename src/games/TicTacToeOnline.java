@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class TicTacToeOnline {
-    private Board board;
+    public Board board = new Board(3, 3);
     private GameSocket gameSocket;
     private Player player;
     private String opponentName;
@@ -33,7 +33,6 @@ public class TicTacToeOnline {
 
         this.gameSocket = gameSocket;
         this.player = player;
-        this.board = new Board(3, 3);
         player.setIcon(Icon.CROSS);
 
         gameSocket.onMatchEvent.addListener(onMatch);

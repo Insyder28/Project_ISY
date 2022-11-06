@@ -34,23 +34,24 @@ public class TicTacToe {
                 }
 
                 // Get move from player
+                System.out.println(board);
                 System.out.println("\n" + player.getIcon() + "'s turn\n" + board);
                 int pos = player.move(board);
 
                 // Validate
-                if (!validateMove(pos)) {
-                    if (player.getIcon() == Icon.CROSS) winner = players[1];
-                    else winner = player;
-
-                    loop = false;
-                    break;
-                }
+//                if (!validateMove(pos)) {
+//                    if (player.getIcon() == Icon.CROSS) winner = players[1];
+//                    else winner = player;
+//
+//                    loop = false;
+//                    break;
+//                }
 
                 // Set move on board
                 board.set(pos, player.getIcon());
 
                 // Check for winner
-                if (checkWinner(player.getIcon())) {
+                if (hasWon(player.getIcon())) {
                     winner = player;
                     loop = false;
                     break;
@@ -72,6 +73,10 @@ public class TicTacToe {
         gameRunning = false;
     }
 
+    public Board getBoard() {
+        return this.board;
+    }
+
     private boolean validateMove(int pos) {
         if (pos < 0 || pos > 8) return false;
 
@@ -81,33 +86,47 @@ public class TicTacToe {
         return board.data[row][col] == Icon.NO_ICON;
     }
 
-    private boolean checkWinner(Icon icon) {
-        // Check rows
-        for (int i = 0; i < board.height; i++)
-            if (checkRow(i, icon)) return true;
-
-        // Check columns
-        for (int i = 0; i < board.width; i++) {
-            if (checkCol(i, icon)) return true;
+    private boolean hasWon(Icon icon) {
+        //Check all columns for 3 in a row of icon
+        for (int row = 0; row < board.height-2; row++) {
+            for (int col = 0; col < board.width; col++) {
+                if (board.data[row][col] == icon
+                        && board.data[row][col] == board.data[row + 1][col]
+                        && board.data[row][col] == board.data[row + 2][col]) {
+                    return true;
+                }
+            }
         }
-
-        // Check top-left to bottom-right
-        if (board.data[0][0] == icon && board.data[1][1] == icon && board.data[2][2] == icon)
-            return true;
-
-        // Check bottom-left to top right
-        return board.data[2][0] == icon && board.data[1][1] == icon && board.data[0][2] == icon;
-    }
-
-    private boolean checkRow(int index, Icon icon) {
-        for (Icon col : board.data[index])
-            if (col != icon) return false;
-        return true;
-    }
-
-    private boolean checkCol(int index, Icon icon) {
-        for (int i = 0; i < board.height; i++)
-            if (board.data[i][index] != icon) return false;
-        return true;
+        //Check all rows for 3 in a row of icon
+        for (int row = 0; row < board.height; row++) {
+            for (int col = 0; col < board.width-2; col++) {
+                if (board.data[row][col] == icon
+                        && board.data[row][col] == board.data[row][col + 1]
+                        && board.data[row][col] == board.data[row][col + 2]) {
+                    return true;
+                }
+            }
+        }
+        //Check diagonals down-right
+        for (int row = 0; row < board.height-2; row++) {
+            for (int col = 0; col < board.width-2; col++) {
+                if (board.data[row][col] == icon
+                        && board.data[row][col] == board.data[row + 1][col + 1]
+                        && board.data[row][col] == board.data[row + 2][col + 2]) {
+                    return true;
+                }
+            }
+        }
+        //Check diagonals down-left
+        for (int row = 0; row < board.height-2; row++) {
+            for (int col = 2; col < board.width; col++) {
+                if (board.data[row][col] == icon
+                        && board.data[row][col] == board.data[row + 1][col - 1]
+                        && board.data[row][col] == board.data[row + 2][col - 2]) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
