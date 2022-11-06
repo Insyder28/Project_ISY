@@ -19,6 +19,7 @@ public class GameSocket implements Closeable {
 
     private int serverTimeOutDelay = 1000;
     private boolean loggedIn = false;
+    private String playerName;
 
     // Server events
     /**
@@ -105,6 +106,13 @@ public class GameSocket implements Closeable {
         return loggedIn;
     }
 
+    /**
+     * @return Name with witch player has logged in.
+     */
+    public String getPlayerName() {
+        return playerName;
+    }
+
     // Methods
 
     /**
@@ -132,6 +140,7 @@ public class GameSocket implements Closeable {
     public void login(String playerName) throws ServerException {
         try {
             command("login " + playerName, false);
+            this.playerName = playerName;
             loggedIn = true;
         }
         catch (ServerException e) {

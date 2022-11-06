@@ -8,14 +8,31 @@ import java.util.List;
  */
 public class Event {
     private final List<EventListener> listeners = new ArrayList<>();
+    private final List<EventListener> toRemove = new ArrayList<>();
+
+    private boolean canRemove = true;
+    private boolean waitingForRemoval = false;
 
     /**
      * Adds an {@link EventListener} to the event.
-     * @param toAdd the listener to add
+     * @param listener the listener to add
      */
     @SuppressWarnings("unused")
-    public void addListener(EventListener toAdd) {
-        listeners.add(toAdd);
+    public void addListener(EventListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * Removes an {@link EventListener} from the event.
+     * @param listener the listener to remove
+     */
+    @SuppressWarnings("unused")
+    public void removeListener(EventListener listener) {
+        if (canRemove) listeners.remove(listener);
+        else {
+            toRemove.add(listener);
+            waitingForRemoval = true;
+        }
     }
 
     /**
@@ -23,8 +40,15 @@ public class Event {
      * @param args args that get passed to all the added {@link EventListener} objects.
      */
     public void call(String args) {
-        for (EventListener el : listeners)
-            el.onEvent(args);
+        canRemove = false;
+        for (EventListener el : listeners) {
+            new Thread(() -> el.onEvent(args)).start();
+        }
+        canRemove = true;
+
+        if (waitingForRemoval)
+            for (EventListener listener : toRemove)
+                listeners.remove(listener);
     }
 
     /**

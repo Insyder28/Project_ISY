@@ -24,7 +24,7 @@ public class Board {
         for (int i = 0; i < height; i++) {
             sb.append(' ');
             for (int j = 0; j < width; j++) {
-                sb.append(data[i][j].getIcon());
+                sb.append(data[i][j].getChar());
                 if (j < width - 1) sb.append(" | ");
             }
             if (i < height - 1) sb.append("\n");

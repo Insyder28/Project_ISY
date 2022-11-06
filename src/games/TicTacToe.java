@@ -1,14 +1,19 @@
 package games;
 
-import networking.GameSocket;
 import players.Player;
 
 public class TicTacToe {
-    private Player[] players = new Player[2];
-    private Board board = new Board(3, 3);
+    private Board board;
+    private boolean gameRunning = false;
 
-    public void startLocalGame(Player xPlayer, Player oPlayer) {
+    public void startGame(Player xPlayer, Player oPlayer) {
+        if (gameRunning) throw new RuntimeException("Game already running"); //TODO: create custom exception.
+        gameRunning = true;
+
         // Setup
+        Player[] players = new Player[2];
+        board = new Board(3, 3);
+
         players[0] = xPlayer;
         xPlayer.setIcon(Icon.CROSS);
 
@@ -64,10 +69,7 @@ public class TicTacToe {
 
         System.out.println("\nWinner is: '" + winner.getIcon() + "'");
         System.out.println(board);
-    }
-
-    public void startOnlineGame(Player player) {
-        // ...
+        gameRunning = false;
     }
 
     private boolean validateMove(int pos) {

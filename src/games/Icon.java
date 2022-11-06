@@ -9,7 +9,11 @@ public enum Icon {   // to save as "Seed.java"
         this.icon = icon;
     }
     // Public Getter
-    public char getIcon() {
+    public char getChar() {
         return icon;
+    }
+
+    public Icon opponentIcon() {
+        return this == Icon.CROSS ? Icon.NOUGHT : Icon.CROSS;
     }
 }
