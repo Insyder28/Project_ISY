@@ -64,7 +64,8 @@ public class TicTacToe {
 
         // Game finished
         if (winner == null) {
-            System.out.println("draw");
+            System.out.println("\nDraw");
+            System.out.println(board);
             return;
         }
 

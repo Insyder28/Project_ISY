@@ -1,7 +1,5 @@
-import games.TicTacToe;
 import games.TicTacToeOnline;
 import networking.GameSocket;
-import networking.ServerException;
 import players.HumanPlayer;
 
 public class Main {
