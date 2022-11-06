@@ -13,11 +13,6 @@ public class AIPlayer implements Player {
     protected int COLS;
     protected Icon[][] cells;
 
-    public AIPlayer(Board board) {
-        ROWS = board.height;
-        COLS = board.width;
-    }
-
     @Override
     public Icon getIcon() {
         return myIcon;
@@ -31,7 +26,10 @@ public class AIPlayer implements Player {
 
     @Override
     public int move(Board board) {
+        ROWS = board.height;
+        COLS = board.width;
         cells = board.data;
+
         int[] results = minimax(9, myIcon);
         //System.out.println("AI wants to play col: " + results[2] + " row: " + results[1]);
         return (results[1]) * ROWS + results[2];
