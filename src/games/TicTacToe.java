@@ -6,13 +6,17 @@ public class TicTacToe {
     private Board board;
     private boolean gameRunning = false;
 
+    public TicTacToe () {
+        board = new Board(3, 3);
+    }
+
     public void startGame(Player xPlayer, Player oPlayer) {
         if (gameRunning) throw new RuntimeException("Game already running"); //TODO: create custom exception.
         gameRunning = true;
 
         // Setup
+        board.clear();
         Player[] players = new Player[2];
-        board = new Board(3, 3);
 
         players[0] = xPlayer;
         xPlayer.setIcon(Icon.CROSS);
@@ -34,7 +38,6 @@ public class TicTacToe {
                 }
 
                 // Get move from player
-                System.out.println(board);
                 System.out.println("\n" + player.getIcon() + "'s turn\n" + board);
                 int pos = player.move(board);
 

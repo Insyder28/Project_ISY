@@ -33,7 +33,7 @@ public class AIPlayer implements Player {
     public int move(Board board) {
         cells = board.data;
         int[] results = minimax(9, myIcon);
-        System.out.println("AI wants to play col: " + results[2] + " row: " + results[1]);
+        //System.out.println("AI wants to play col: " + results[2] + " row: " + results[1]);
         return (results[1]) * ROWS + results[2];
     }
 

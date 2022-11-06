@@ -36,4 +36,10 @@ public class Board {
     public void set(int pos, Icon icon) {
         data[pos / height][pos % height] = icon;
     }
+
+    public void clear() {
+        for (int i = 0; i < height; i++)
+            for (int j = 0; j < width; j++)
+                data[i][j] = Icon.NO_ICON;
+    }
 }
