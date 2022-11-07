@@ -6,6 +6,7 @@ public class SecondFrame extends JFrame implements ActionListener {
 
     JButton local = new JButton();
     JButton online = new JButton();
+    JButton exit = new JButton();
     JLabel label = new JLabel();
     JButton back = new JButton();
     String server;
@@ -21,24 +22,33 @@ public class SecondFrame extends JFrame implements ActionListener {
 
 
         local.setText("Local");
-        local.addActionListener(this::actionPerformed);
+        local.addActionListener(this);
         local.setBounds(200, 300, 100, 50);
 
         online.setText("Online");
-        online.addActionListener(this::actionPerformed);
+        online.addActionListener(this);
         online.setBounds(400, 300, 100, 50);
 
         label.setBounds(250,200,200,100);
         label.setText("Do you want to play local or online?");
 
+        exit.setBounds(600, 20, 75, 75);
+        exit.setText("Exit");
+        exit.addActionListener(this);
+
         add(back);
         add(online);
         add(local);
         add(label);
+        add(exit);
 
         back.setBounds(20, 20, 75, 75);
         back.setText("Return");
-        back.addActionListener(this::actionPerformed);
+        back.addActionListener(this);
+
+        exit.setBounds(600, 20, 75, 75);
+        exit.setText("Exit");
+        exit.addActionListener(this);
     }
 
     @Override
@@ -60,6 +70,10 @@ public class SecondFrame extends JFrame implements ActionListener {
         if(e.getSource()==back){
             dispose();
             new Launcher();
+        }
+
+        if (e.getSource()==exit){
+            dispose();
         }
     }
 }

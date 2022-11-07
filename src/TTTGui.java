@@ -1,57 +1,41 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class TTTGui extends JFrame{
-    JButton button = new JButton();
-    JButton button2 = new JButton();
-    JButton back = new JButton();
-    JButton exit = new JButton();
-    JLabel label = new JLabel();
+public class TTTGui implements ActionListener {
 
+
+    JFrame frame = new JFrame();
+    JPanel grid_panel = new JPanel();
     JButton[] grid = new JButton[9];
 
     TTTGui(){
-        button.setBounds(200, 300, 100, 50);
-        button.setText("Local");
-        button.addActionListener(this::actionPerformed2);
+        frame.setTitle("TicTacToe");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(720, 720);
+        frame.setLocationRelativeTo(null);
+        frame.setLayout(new BorderLayout());
+        frame.setVisible(true);
 
-        button2.setBounds(400, 300, 100, 50);
-        button2.addActionListener(this::actionPerformed2);
-        button2.setText("Online");
+        grid_panel.setLayout(new GridLayout(3,3));
+        grid_panel.setBackground(new Color(150, 150, 150));
 
-        label.setBounds(250,200,200,100);
-        label.setText("Do you want to play local or online?");
-
-        back.setBounds(20, 20, 75, 75);
-        back.addActionListener(this::actionPerformed2);
-        back.setText("Return");
-
-        exit.setBounds(20, 40, 75, 75);
-        exit.addActionListener(this::actionPerformed2);
-        exit.setText("Exit");
-
-
-        this.setTitle("Game Launcher");
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(720, 720);
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
-        this.setLayout(null);
-
-        this.add(button);
-        this.add(button2);
-        this.add(label);
-        this.add(back);
-        this.add(exit);
-    }
-    public void actionPerformed2(ActionEvent e) {
-        if(e.getSource()==back) {
-            this.dispose();
-            new Launcher();
+        for (int i=0; i<9; i++){
+            grid[i] = new JButton();
+            grid_panel.add(grid[i]);
+            grid[i].setFont(new Font("MV Boli", Font.BOLD,120));
+            grid[i].setFocusable(false);
+            grid[i].addActionListener(this);
         }
-        if(e.getSource()==exit){
-            this.dispose();
-        }
+
+        frame.add(grid_panel);
+
+
     }
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+    }
 }

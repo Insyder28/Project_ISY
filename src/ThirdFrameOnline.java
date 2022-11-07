@@ -7,9 +7,11 @@ public class ThirdFrameOnline extends JFrame implements ActionListener {
     JButton ai = new JButton();
     JButton human = new JButton();
     JLabel label = new JLabel();
+    JButton exit = new JButton();
     JButton back = new JButton();
-    JTextField serverIP = new JTextField("Enter server IP here");
-    public String player;
+    JTextField serverIP = new JTextField();
+    String player;
+    String IP;
 
     ThirdFrameOnline(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -21,11 +23,11 @@ public class ThirdFrameOnline extends JFrame implements ActionListener {
 
 
         ai.setText("AI");
-        ai.addActionListener(this::actionPerformed);
+        ai.addActionListener(this);
         ai.setBounds(200, 300, 100, 50);
 
         human.setText("Human");
-        human.addActionListener(this::actionPerformed);
+        human.addActionListener(this);
         human.setBounds(400, 300, 100, 50);
 
         label.setBounds(250,200,200,100);
@@ -34,6 +36,17 @@ public class ThirdFrameOnline extends JFrame implements ActionListener {
         serverIP.setLayout(null);
         serverIP.setBounds(250, 500, 200, 50);
         serverIP.setVisible(true);
+        serverIP.replaceSelection("Enter IP here");
+        serverIP.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        exit.setBounds(600, 20, 75, 75);
+        exit.setText("Exit");
+        exit.addActionListener(this);
 
 
         add(back);
@@ -41,10 +54,11 @@ public class ThirdFrameOnline extends JFrame implements ActionListener {
         add(ai);
         add(label);
         add(serverIP);
+        add(exit);
 
         back.setBounds(20, 20, 75, 75);
         back.setText("Return");
-        back.addActionListener(this::actionPerformed);
+        back.addActionListener(this);
     }
 
     @Override
@@ -65,5 +79,12 @@ public class ThirdFrameOnline extends JFrame implements ActionListener {
             dispose();
             new SecondFrame();
         }
+
+        if (e.getSource()==exit){
+            dispose();
+        }
+
+        IP = serverIP.getText();
+        System.out.println(IP);
     }
 }

@@ -7,17 +7,22 @@ public class Launcher extends JFrame implements ActionListener {
     JButton TTT = new JButton();
     JButton Othello = new JButton();
     JLabel label = new JLabel();
+    JButton exit = new JButton();
     String game;
 
 
     Launcher(){
         TTT.setBounds(200, 300, 100, 50);
-        TTT.addActionListener(this::actionPerformed);
+        TTT.addActionListener(this);
         TTT.setText("TicTacToe");
 
         Othello.setBounds(400, 300, 100, 50);
-        Othello.addActionListener(this::actionPerformed);
+        Othello.addActionListener(this);
         Othello.setText("Othello");
+
+        exit.setBounds(600, 20, 75, 75);
+        exit.setText("Exit");
+        exit.addActionListener(this);
 
         label.setBounds(300,200,200,100);
         label.setText("Choose a game to play!");
@@ -31,6 +36,7 @@ public class Launcher extends JFrame implements ActionListener {
         add(TTT);
         add(Othello);
         add(label);
+        add(exit);
     }
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -39,6 +45,7 @@ public class Launcher extends JFrame implements ActionListener {
             new SecondFrame();
             game = "TicTacToe";
             System.out.println(game);
+            new TTTGui();
         }
 
         if(e.getSource()==Othello){
@@ -47,6 +54,10 @@ public class Launcher extends JFrame implements ActionListener {
             game = "Othello";
             System.out.println(game);
 
+        }
+
+        if (e.getSource()==exit){
+            dispose();
         }
     }
 }
