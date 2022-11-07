@@ -1,44 +1,22 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class Launcher extends JFrame{
+public class Launcher extends JFrame implements ActionListener {
 
     JButton TTT = new JButton();
     JButton Othello = new JButton();
-    JButton back = new JButton();
     JLabel label = new JLabel();
-    JTextField serverIP = new JTextField("Enter server IP here");
-    String game;
-    String server;
+    public String game;
 
 
     Launcher(){
         TTT.setBounds(200, 300, 100, 50);
-        TTT.addActionListener(new AbstractAction("TTT") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(e.getSource()==TTT){
-                    SecondFrame();
-                    game = "TicTacToe";
-                    System.out.println(game);
-
-                }
-            }
-        });
+        TTT.addActionListener(this::actionPerformed);
         TTT.setText("TicTacToe");
 
         Othello.setBounds(400, 300, 100, 50);
-        Othello.addActionListener(new AbstractAction("Othello") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(e.getSource()==Othello){
-                    SecondFrame();
-                    game = "Othello";
-                    System.out.println(game);
-
-                }
-            }
-        });
+        Othello.addActionListener(this::actionPerformed);
         Othello.setText("Othello");
 
         label.setBounds(300,200,200,100);
@@ -54,56 +32,21 @@ public class Launcher extends JFrame{
         add(Othello);
         add(label);
     }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource()==TTT){
+            dispose();
+            new SecondFrame();
+            game = "TicTacToe";
+            System.out.println(game);
+        }
 
-    public void SecondFrame(){
-        TTT.setText("Local");
-        TTT.addActionListener(new AbstractAction("local") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource()==TTT){
-                    server = "local";
-                    System.out.println(server);
-                }
-            }
-        });
+        if(e.getSource()==Othello){
+            dispose();
+            new SecondFrame();
+            game = "Othello";
+            System.out.println(game);
 
-        Othello.setText("Online");
-        Othello.addActionListener(new AbstractAction("online") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource()==Othello){
-                    server = "online";
-                    System.out.println(server);
-                    Server();
-                }
-            }
-        });
-
-        label.setBounds(250,200,200,100);
-        label.setText("Do you want to play local or online?");
-
-        add(back);
-
-        back.setBounds(20, 20, 75, 75);
-        back.setText("Return");
-        back.addActionListener(new AbstractAction("return") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(e.getSource()==back){
-                    dispose();
-                    new Launcher();
-                }
-            }
-        });
-
-
-
-    }
-
-    public void Server(){
-        serverIP.setLayout(null);
-        serverIP.setBounds(300, 500, 200, 50);
-        serverIP.setVisible(true);
-        add(serverIP);
+        }
     }
 }
