@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Class for playing Tic-Tac-Toe on a server.
+ * @author Erwin Veenhoven
  */
 public class TicTacToeOnline {
     public Board board = new Board(3, 3);

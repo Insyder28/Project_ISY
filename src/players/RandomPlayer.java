@@ -9,6 +9,7 @@ import java.util.Random;
 
 /**
  * A player that does random moves.
+ * @author Erwin Veenhoven
  */
 public class RandomPlayer implements Player {
     private Icon icon;

@@ -6,6 +6,9 @@ import games.Icon;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Hindrik Kroes
+ */
 public class AIPlayer implements Player {
     protected Icon myIcon;
     protected Icon oppIcon;
