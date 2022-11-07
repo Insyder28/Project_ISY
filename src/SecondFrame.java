@@ -8,8 +8,7 @@ public class SecondFrame extends JFrame implements ActionListener {
     JButton online = new JButton();
     JLabel label = new JLabel();
     JButton back = new JButton();
-
-    public String server;
+    String server;
 
 
     SecondFrame(){
@@ -42,22 +41,19 @@ public class SecondFrame extends JFrame implements ActionListener {
         back.addActionListener(this::actionPerformed);
     }
 
-    public String getServer(){
-        return this.server;
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource()==local){
+            dispose();
             new ThirdFrame();
-            this.server = "local";
+            server = "local";
             System.out.println(server);
         }
 
         if (e.getSource()==online){
             dispose();
-            new ThirdFrame();
-            this.server = "online";
+            new ThirdFrameOnline();
+            server = "online";
             System.out.println(server);
         }
 

@@ -7,7 +7,7 @@ public class Launcher extends JFrame implements ActionListener {
     JButton TTT = new JButton();
     JButton Othello = new JButton();
     JLabel label = new JLabel();
-    public String game;
+    String game;
 
 
     Launcher(){

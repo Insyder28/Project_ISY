@@ -2,15 +2,16 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ThirdFrame extends JFrame implements ActionListener {
+public class ThirdFrameOnline extends JFrame implements ActionListener {
 
     JButton ai = new JButton();
     JButton human = new JButton();
     JLabel label = new JLabel();
     JButton back = new JButton();
-    String player;
+    JTextField serverIP = new JTextField("Enter server IP here");
+    public String player;
 
-    ThirdFrame(){
+    ThirdFrameOnline(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setSize(720, 720);
@@ -30,10 +31,16 @@ public class ThirdFrame extends JFrame implements ActionListener {
         label.setBounds(250,200,200,100);
         label.setText("Do you want to play or let AI play?");
 
+        serverIP.setLayout(null);
+        serverIP.setBounds(250, 500, 200, 50);
+        serverIP.setVisible(true);
+
+
         add(back);
         add(human);
         add(ai);
         add(label);
+        add(serverIP);
 
         back.setBounds(20, 20, 75, 75);
         back.setText("Return");
