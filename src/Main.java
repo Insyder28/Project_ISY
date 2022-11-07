@@ -6,11 +6,17 @@ import players.Player;
 
 public class Main {
     public static void main(String[] args) {
+        String ip = args[0];
+        int port = Integer.parseInt(args[1]);
+        String playerName = args[2];
+        String playerType = args[3];
+
+
         GameSocket gameSocket;
 
         try {
-            gameSocket = new GameSocket(args[0], Integer.parseInt(args[1]));
-            gameSocket.login(args[2]);
+            gameSocket = new GameSocket(ip, port);
+            gameSocket.login(playerName);
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -18,7 +24,7 @@ public class Main {
 
         TicTacToeOnline ticTacToeOnline = new TicTacToeOnline();
 
-        Player player = args[3].equals("AI") ? new AIPlayer() : new HumanPlayer();
+        Player player = playerType.equals("AI") ? new AIPlayer() : new HumanPlayer();
 
         ticTacToeOnline.startGame(player, gameSocket);
 
