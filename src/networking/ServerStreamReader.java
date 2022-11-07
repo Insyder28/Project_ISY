@@ -95,7 +95,6 @@ public class ServerStreamReader implements Closeable {
         executor.shutdown();
     }
 
-    //TODO: fix mixed messages
     private void handleMessage(String message) {
         if (message.startsWith("SVR GAME ")) {
             String event = message.replace("SVR ", "");

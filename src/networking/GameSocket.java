@@ -99,6 +99,7 @@ public class GameSocket implements Closeable {
     }
 
     /**
+     * Returns login status of player.
      * @return true if player is logged in.
      */
     @SuppressWarnings("unused")
@@ -107,6 +108,7 @@ public class GameSocket implements Closeable {
     }
 
     /**
+     * Returns the Name with witch player has logged in.
      * @return Name with witch player has logged in.
      */
     public String getPlayerName() {

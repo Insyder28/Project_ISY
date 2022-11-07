@@ -10,17 +10,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
+/**
+ * Class for playing Tic-Tac-Toe on a server.
+ */
 public class TicTacToeOnline {
     public Board board = new Board(3, 3);
     private GameSocket gameSocket;
     private Player player;
     private String opponentName;
-    private int count = 0;
+
+    private int count = 0;   // Keeps track of how many moves have been set
 
     final AtomicBoolean foundMatch = new AtomicBoolean(false);
     final AtomicBoolean receivedOpponentMove = new AtomicBoolean(false);
 
+    private final Object threadHolder = new Object();
+
+    // Create EventListener objects, so they can be removed from the events later
     private final EventListener onMatch = this::onMatch;
     private final EventListener onYourTurn = this::onYourTurn;
     private final EventListener onMove = this::onMove;
@@ -28,9 +34,15 @@ public class TicTacToeOnline {
     private final EventListener onWin = this::onWin;
     private final EventListener onDraw = this::onDraw;
 
+    /**
+     * Starts a multiplayer Tic-Tac-Toe game.
+     * @param player The player type that plays the game.
+     * @param gameSocket The transport for playing the game.
+     */
     public void startGame(Player player, GameSocket gameSocket) {
-        if (!gameSocket.isLoggedIn()) throw new ServerRuntimeException("Not logged in");
+        if (!gameSocket.isLoggedIn()) throw new ServerRuntimeException("Not logged in");   // Check if player is logged in.
 
+        // Initialise
         this.gameSocket = gameSocket;
         this.player = player;
         player.setIcon(Icon.CROSS);
@@ -42,6 +54,7 @@ public class TicTacToeOnline {
         gameSocket.onWinEvent.addListener(onWin);
         gameSocket.onDrawEvent.addListener(onDraw);
 
+        // Subscribe to Tic-Tac-Toe
         try {
             System.out.println("Waiting for game...");
             gameSocket.subscribe("tic-tac-toe");
@@ -50,8 +63,9 @@ public class TicTacToeOnline {
             onServerTimedOut(e);
         }
 
-        synchronized (this) {
-            try { this.wait(); }
+        // Sleep thread until game is finished
+        synchronized (threadHolder) {
+            try { threadHolder.wait(); }
             catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -59,12 +73,14 @@ public class TicTacToeOnline {
     }
 
     private void onMatch(String args) {
-        Map<String, String> data = toMap(args);
+        Map<String, String> data = toMap(args);   // Create map from server data
         opponentName = data.get("OPPONENT");
         System.out.println("Found match!\nPlaying against: " + opponentName);
 
-        if (!data.get("PLAYERTOMOVE").equals(gameSocket.getPlayerName())) {
-            System.out.println("\n" + opponentName + "'s turn\n" + board + "\n\n" + opponentName + " entering move...");
+        if (!data.get("PLAYERTOMOVE").equals(gameSocket.getPlayerName())) {   // If opponent has first move
+            System.out.println("\n" + opponentName + "'s turn");
+            System.out.println(board);
+            System.out.println("\n" + opponentName + " entering move...");
         }
         else {
             synchronized (receivedOpponentMove) {
@@ -73,6 +89,7 @@ public class TicTacToeOnline {
             }
         }
 
+        // Set foundMatch to true
         synchronized (foundMatch) {
             foundMatch.set(true);
             foundMatch.notify();
@@ -80,6 +97,7 @@ public class TicTacToeOnline {
     }
 
     private void onYourTurn(String args) {
+        // Check if onMatch event has been called. If not sleep thread until it is called.
         synchronized (foundMatch) {
             if (!foundMatch.get()) {
                 try { foundMatch.wait(); }
@@ -87,6 +105,7 @@ public class TicTacToeOnline {
             }
         }
 
+        // Check if the opponent move has been set on the board before doing own move.
         synchronized (receivedOpponentMove) {
             if (!receivedOpponentMove.get()) {
                 try { receivedOpponentMove.wait(); }
@@ -95,6 +114,7 @@ public class TicTacToeOnline {
             receivedOpponentMove.set(false);
         }
 
+        // Send the move to the server
         try {
             System.out.println("\nYour turn\n" + board);
             gameSocket.move(player.move(board));
@@ -105,19 +125,23 @@ public class TicTacToeOnline {
     }
 
     private void onMove(String args) {
-        count++;
+        count++;   // Increment move counter
 
-        Map<String, String> data = toMap(args);
-        boolean ownMove = data.get("PLAYER").equals(gameSocket.getPlayerName());
+        Map<String, String> data = toMap(args);   // Convert server data to map
+        boolean ownMove = data.get("PLAYER").equals(gameSocket.getPlayerName());  // Check if the move was done by us
 
-        Icon currentPlayer = ownMove ? player.getIcon() : player.getIcon().opponentIcon();
-        board.set(Integer.parseInt(data.get("MOVE")), currentPlayer);
+        Icon currentPlayer = ownMove ? player.getIcon() : player.getIcon().opponentIcon();   // Get the icon of the current player
+        board.set(Integer.parseInt(data.get("MOVE")), currentPlayer);   // Set the move on the board
 
         if (ownMove) {
-            if (!checkWinner(currentPlayer) && count < 9)
-                System.out.println("\n" + opponentName + "'s turn\n" + board + "\n\n" + opponentName + " entering move...");
+            if (!checkWinner(currentPlayer) && count < 9) {
+                System.out.println("\n" + opponentName + "'s turn");
+                System.out.println(board);
+                System.out.println("\n" + opponentName + " entering move...");
+            }
         }
         else {
+            // Set receivedOpponentMove to true
             synchronized (receivedOpponentMove) {
                 receivedOpponentMove.set(true);
                 receivedOpponentMove.notify();
@@ -141,6 +165,7 @@ public class TicTacToeOnline {
     }
 
     private void endGame() {
+        // Remove all listeners from events
         gameSocket.onMatchEvent.removeListener(onMatch);
         gameSocket.onYourTurnEvent.removeListener(onYourTurn);
         gameSocket.onMoveEvent.removeListener(onMove);
@@ -148,8 +173,9 @@ public class TicTacToeOnline {
         gameSocket.onWinEvent.removeListener(onWin);
         gameSocket.onDrawEvent.removeListener(onDraw);
 
-        synchronized (this) {
-            this.notify(); //TODO: use private object
+        // Notify the object that holds the lock on the main thread.
+        synchronized (threadHolder) {
+            threadHolder.notify();
         }
     }
 
@@ -160,8 +186,9 @@ public class TicTacToeOnline {
 
     private Map<String, String> toMap(String s) {
         Map<String, String> map = new HashMap<>();
-        String[] pairs = s.substring(1, s.length() - 2).split(", ");
+        String[] pairs = s.substring(1, s.length() - 2).split(", ");   // Create pairs, example of pair: 'KEY: "value"'
 
+        // Put pairs in map
         for (String pair : pairs) {
             String[] split = pair.split(": ");
             map.put(split[0], split[1].substring(1, split[1].length() - 1));

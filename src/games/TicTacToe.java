@@ -3,13 +3,14 @@ package games;
 import players.Player;
 
 public class TicTacToe {
-    private Board board;
+    private final Board board;
     private boolean gameRunning = false;
 
     public TicTacToe () {
         board = new Board(3, 3);
     }
 
+    @SuppressWarnings("unused")
     public void startGame(Player xPlayer, Player oPlayer) {
         if (gameRunning) throw new RuntimeException("Game already running"); //TODO: create custom exception.
         gameRunning = true;
@@ -42,13 +43,13 @@ public class TicTacToe {
                 int pos = player.move(board);
 
                 // Validate
-//                if (!validateMove(pos)) {
-//                    if (player.getIcon() == Icon.CROSS) winner = players[1];
-//                    else winner = player;
-//
-//                    loop = false;
-//                    break;
-//                }
+                if (!validateMove(pos)) {
+                    if (player.getIcon() == Icon.CROSS) winner = players[1];
+                    else winner = player;
+
+                    loop = false;
+                    break;
+                }
 
                 // Set move on board
                 board.set(pos, player.getIcon());

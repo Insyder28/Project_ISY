@@ -1,5 +1,9 @@
 package games;
-public enum Icon {   // to save as "Seed.java"
+
+/**
+ * Represents an icon that can be placed on a {@link Board}.
+ */
+public enum Icon {
     CROSS('X'), NOUGHT('O'), NO_ICON(' ');
 
     // Private variable
@@ -8,11 +12,19 @@ public enum Icon {   // to save as "Seed.java"
     Icon(char icon) {
         this.icon = icon;
     }
-    // Public Getter
+
+    /**
+     * Getter for char.
+     * @return The char value that the Icon represents.
+     */
     public char getChar() {
         return icon;
     }
 
+    /**
+     * Returns the Icon of the opponent.
+     * @return The Icon of the opponent.
+     */
     public Icon opponentIcon() {
         return this == Icon.CROSS ? Icon.NOUGHT : Icon.CROSS;
     }
