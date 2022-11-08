@@ -4,7 +4,9 @@ public class Main {
 
         GUI gui = new GUI(); //creates the frame
         gui.MainFrame();
-        gui.endGame("Test");
+        //gui.endGame("Test");
+        gui.setCurrentPlayer('X');
+        gui.getMove();
 
 
     }

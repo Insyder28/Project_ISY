@@ -9,22 +9,22 @@ public class TTTGui extends JFrame implements ActionListener {
     JPanel title_panel = new JPanel();
     JLabel textField = new JLabel();
     JButton[] grid = new JButton[9];
+    public static int buttonPressed;
 
 
-    TTTGui(){
+    TTTGui() {
         setTitle("TicTacToe");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(720, 720);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-        setVisible(true);
 
-        grid_panel.setLayout(new GridLayout(3,3));
+        grid_panel.setLayout(new GridLayout(3, 3));
         grid_panel.setBackground(new Color(150, 150, 150));
 
         textField.setBackground(new Color(25, 25, 25));
         textField.setForeground(new Color(25, 255, 0));
-        textField.setFont(new Font("Monospace", Font.BOLD,75));
+        textField.setFont(new Font("Monospace", Font.BOLD, 75));
         textField.setHorizontalAlignment(JLabel.CENTER);
         textField.setText("Tic-Tac-Toe");
         textField.setOpaque(true);
@@ -34,10 +34,10 @@ public class TTTGui extends JFrame implements ActionListener {
 
         title_panel.add(textField);
 
-        for (int i=0; i<9; i++){
+        for (int i = 0; i < 9; i++) {
             grid[i] = new JButton();
             grid_panel.add(grid[i]);
-            grid[i].setFont(new Font("MV Boli", Font.BOLD,120));
+            grid[i].setFont(new Font("MV Boli", Font.BOLD, 120));
             grid[i].setFocusable(false);
             grid[i].addActionListener(this);
         }
@@ -48,8 +48,27 @@ public class TTTGui extends JFrame implements ActionListener {
 
     }
 
+    public void MainFrame() {
+        setVisible(true);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        for (int i = 0; i < 9; i++) {
+            if (GUI.icon == 'X') {
+                if (e.getSource() == grid[i]) {
+//                    if (grid[i].getText() == "") {
+//                        grid[i].setForeground(new Color(255, 0, 0));
+//                        grid[i].setText("X");
+                        this.buttonPressed = i;
+                }
+            } else {
+                if (e.getSource() == grid[i]) {
+//                    if (grid[i].getText() == "") {
+//                        grid[i].setForeground(new Color(0, 0, 255));
+//                        grid[i].setText("O");
+                }
+            }
+        }
     }
 }

@@ -10,6 +10,8 @@ public class GUI extends JFrame implements ActionListener {
     JLabel label = new JLabel();
     JButton exit = new JButton();
     String game;
+    TTTGui ttt = new TTTGui();
+    public static char icon;
 
 
     public GUI(){
@@ -50,7 +52,8 @@ public class GUI extends JFrame implements ActionListener {
             new SecondFrame();
             game = "TicTacToe";
             System.out.println(game);
-            new TTTGui();
+            ttt.MainFrame();
+
         }
 
         if(e.getSource()==Othello){
@@ -69,6 +72,24 @@ public class GUI extends JFrame implements ActionListener {
     public void endGame (String message){
         JOptionPane.showMessageDialog(null, message, "End of game", JOptionPane.PLAIN_MESSAGE);
     }
+
+    public void setCurrentPlayer(char icon){
+        ttt.textField.setText(icon + " turn");
+        this.icon = icon;
+    }
+
+    public int getMove(){
+        setCurrentPlayer(icon);
+        return TTTGui.buttonPressed;
+    }
+
+    public void updateBoard(char[][] board){
+
+    }
+
+
+
+
 
 
 
