@@ -1,4 +1,8 @@
-package GUI;
+package gui;
+
+import games.Board;
+import games.Icon;
+import threading.MessageBuffer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,11 +61,13 @@ public class TTTGui extends JFrame implements ActionListener {
         setVisible(true);
     }
 
-    public void updateBoard(char[][] board) {
+    public void updateBoard(Board board) {
+        Icon[][] data = board.data;
+
         int index = 0;
-        for (int i = 0; i < board[0].length; i++) {
-            for (int j = 0; j < board.length; j++) {
-                char icon = board[i][j];
+        for (int i = 0; i < board.height; i++) {
+            for (int j = 0; j < board.width; j++) {
+                char icon = data[i][j].getChar();
 
                 grid[index].setText(Character.toString(icon));
                 grid[index].setForeground(icon == 'X' ? new Color(0, 0, 255) : new Color(255, 0, 0));
@@ -73,7 +79,7 @@ public class TTTGui extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         for (int i = 0; i < 9; i++) {
-            if (mainGUI.icon == 'X') {
+            if (mainGUI.icon.getChar() == 'X') {
                 if (e.getSource() == grid[i]) {
 //                    if (grid[i].getText() == "") {
 //                        grid[i].setForeground(new Color(255, 0, 0));

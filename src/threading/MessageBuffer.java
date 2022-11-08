@@ -1,17 +1,17 @@
-package networking;
+package threading;
 
 /**
  * A thread save buffer for messages.
  */
-public class MessageBuffer {
-    String message;
+public class MessageBuffer<T> {
+    T message;
     private volatile boolean notified = false;
 
     /**
      * Set a message and call {@link #notify()} on object in a thread safe manner.
      * @param message the message
      */
-    synchronized public void setMessage(String message) {
+    synchronized public void setMessage(T message) {
         this.message = message;
         this.notified = true;
         this.notify();
@@ -21,15 +21,15 @@ public class MessageBuffer {
      * @return current message stored in buffer.
      */
     @SuppressWarnings("unused")
-    synchronized public String getMessage() {
+    synchronized public T getMessage() {
         return message;
     }
 
     /**
      * Calls {@link #wait()} on object in a thread safe manner.
-     * @see #setMessage(String)
+     * @see #setMessage(T)
      */
-    synchronized public String awaitMessage() {
+    synchronized public T awaitMessage() {
         try { this.wait(); }
         catch (InterruptedException ignored) { }
         return message;
@@ -40,7 +40,7 @@ public class MessageBuffer {
      * @param timeOutDelay the time after witch the waiting times out.
      * @throws TimedOutException Gets thrown when waiting longer than the timeOutDelay.
      */
-    synchronized public String awaitMessage(int timeOutDelay) throws TimedOutException{
+    synchronized public T awaitMessage(int timeOutDelay) throws TimedOutException{
         if (timeOutDelay <= 0) {
             return awaitMessage();
         }

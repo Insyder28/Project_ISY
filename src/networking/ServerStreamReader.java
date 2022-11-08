@@ -1,5 +1,6 @@
 package networking;
 
+import threading.MessageBuffer;
 import events.EventListener;
 
 import java.io.Closeable;
@@ -18,7 +19,7 @@ public class ServerStreamReader implements Closeable {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    private MessageBuffer messageBuffer;
+    private MessageBuffer<String> messageBuffer;
     private volatile boolean bufferResponse;
     private volatile boolean isDataResponse;
     private boolean receivedOk;
@@ -42,7 +43,7 @@ public class ServerStreamReader implements Closeable {
      * @param buffer The buffer to store the response in.
      */
     @SuppressWarnings("unused")
-    public void bufferNextResponse(MessageBuffer buffer) {
+    public void bufferNextResponse(MessageBuffer<String> buffer) {
         bufferNextResponse(buffer, false);
     }
 
@@ -51,7 +52,7 @@ public class ServerStreamReader implements Closeable {
      * @param buffer The buffer to store the response in.
      * @param isDataResponse Set to true when the response contains data.
      */
-    public void bufferNextResponse(MessageBuffer buffer, boolean isDataResponse) {
+    public void bufferNextResponse(MessageBuffer<String> buffer, boolean isDataResponse) {
         this.messageBuffer = buffer;
 
         this.bufferResponse = true;

@@ -1,4 +1,5 @@
 import games.TicTacToeOnline;
+import gui.GUI;
 import networking.GameSocket;
 import players.AIPlayer;
 import players.HumanPlayer;
@@ -11,7 +12,6 @@ public class Main {
         String playerName = args[2];
         String playerType = args[3];
 
-
         GameSocket gameSocket;
 
         try {
@@ -22,11 +22,13 @@ public class Main {
             throw new RuntimeException(e);
         }
 
+        GUI gui = new GUI();
+
         TicTacToeOnline ticTacToeOnline = new TicTacToeOnline();
 
-        Player player = playerType.equals("AI") ? new AIPlayer() : new HumanPlayer();
+        Player player = playerType.equals("AI") ? new AIPlayer() : new HumanPlayer(gui);
 
-        ticTacToeOnline.startGame(player, gameSocket);
+        ticTacToeOnline.startGame(player, gameSocket, gui);
 
         System.out.println("\nDisconnecting...");
         gameSocket.close();
