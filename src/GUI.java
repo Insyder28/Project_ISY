@@ -4,18 +4,15 @@ import java.awt.event.ActionListener;
 
 public class GUI extends JFrame implements ActionListener {
 
-
     JButton TTT = new JButton();
     JButton Othello = new JButton();
     JLabel label = new JLabel();
     JButton exit = new JButton();
+    TTTGui ttt = new TTTGui(this);
     String game;
-    TTTGui ttt = new TTTGui();
-    public static char icon;
-
+    public char icon;
 
     public GUI(){
-
         TTT.setBounds(200, 300, 100, 50);
         TTT.addActionListener(this);
         TTT.setText("TicTacToe");
@@ -80,17 +77,12 @@ public class GUI extends JFrame implements ActionListener {
 
     public int getMove(){
         setCurrentPlayer(icon);
-        return TTTGui.buttonPressed;
+        ttt.buttonPressed.awaitMessage();
+        return ttt.buttonPressed.getMessage();
     }
 
-    public void updateBoard(char[][] board){
-
+    public void updateBoard(char[][] board) {
+        ttt.updateBoard(board);
     }
-
-
-
-
-
-
 
 }

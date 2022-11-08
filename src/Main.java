@@ -4,10 +4,21 @@ public class Main {
 
         GUI gui = new GUI(); //creates the frame
         gui.MainFrame();
-        //gui.endGame("Test");
         gui.setCurrentPlayer('X');
-        gui.getMove();
 
+        System.out.println(gui.getMove());
+        System.out.println(gui.getMove());
 
+        gui.setCurrentPlayer('O');
+
+        char[][] board = {
+                {' ', 'X', ' '},
+                {' ', ' ', 'O'},
+                {'X', ' ', ' '},
+        };
+
+        gui.updateBoard(board);
+
+        gui.endGame("You won!");
     }
 }
