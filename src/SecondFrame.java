@@ -69,7 +69,7 @@ public class SecondFrame extends JFrame implements ActionListener {
 
         if(e.getSource()==back){
             dispose();
-            new Launcher();
+            new GUI();
         }
 
         if (e.getSource()==exit){

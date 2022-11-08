@@ -2,7 +2,8 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Launcher extends JFrame implements ActionListener {
+public class GUI extends JFrame implements ActionListener {
+
 
     JButton TTT = new JButton();
     JButton Othello = new JButton();
@@ -11,7 +12,8 @@ public class Launcher extends JFrame implements ActionListener {
     String game;
 
 
-    Launcher(){
+    public GUI(){
+
         TTT.setBounds(200, 300, 100, 50);
         TTT.addActionListener(this);
         TTT.setText("TicTacToe");
@@ -30,13 +32,16 @@ public class Launcher extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setSize(720, 720);
-        setVisible(true);
         setTitle("Game Launcher");
         setLocationRelativeTo(null);
         add(TTT);
         add(Othello);
         add(label);
         add(exit);
+    }
+
+    public void MainFrame (){
+        setVisible(true);
     }
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -60,4 +65,11 @@ public class Launcher extends JFrame implements ActionListener {
             dispose();
         }
     }
+
+    public void endGame (String message){
+        JOptionPane.showMessageDialog(null, message, "End of game", JOptionPane.PLAIN_MESSAGE);
+    }
+
+
+
 }
