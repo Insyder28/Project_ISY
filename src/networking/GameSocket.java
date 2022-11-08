@@ -234,11 +234,7 @@ public class GameSocket implements Closeable {
     @SuppressWarnings("unused")
     public void challenge(String playerName, String gameType) throws ServerTimedOutException {
         try {
-            String name;
-            if (playerName.contains(" ")) name = '"' + playerName + '"';
-            else name = playerName;
-
-            command("challenge " + name + " " + gameType, false);
+            command("challenge " + playerName + " " + gameType, false);
         }
         catch (ServerTimedOutException e) {
             throw e;
