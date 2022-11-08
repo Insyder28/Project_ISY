@@ -155,7 +155,6 @@ public class GameSocket implements Closeable {
      * Retrieves all available games on the server.
      * @return available games on the server
      * @throws ServerTimedOutException if the server times out.
-     * @throws ServerRuntimeException gets thrown when a server error occurs while trying to subscribe to a game.
      */
     @SuppressWarnings("unused")
     public String[] getGameList() throws ServerTimedOutException {
@@ -175,7 +174,6 @@ public class GameSocket implements Closeable {
      * Retrieves all currently logged in players on the server.
      * @return currently logged in players on the server.
      * @throws ServerTimedOutException if the server times out.
-     * @throws ServerRuntimeException gets thrown when a server error occurs while trying to subscribe to a game.
      */
     @SuppressWarnings("unused")
     public String[] getPlayerList() throws ServerTimedOutException {
@@ -195,7 +193,6 @@ public class GameSocket implements Closeable {
      * Sign up for playing a specific game with someone.
      * @param gameType the game to sign up for
      * @throws ServerTimedOutException if the server times out.
-     * @throws ServerRuntimeException gets thrown when a server error occurs while trying to subscribe to a game.
      */
     @SuppressWarnings("unused")
     public void subscribe(String gameType) throws ServerTimedOutException {
@@ -214,7 +211,6 @@ public class GameSocket implements Closeable {
      * Submits a game move to the server.
      * @param pos the board position from top left to bottom right
      * @throws ServerTimedOutException if the server times out.
-     * @throws ServerRuntimeException gets thrown when a server error occurs while trying to subscribe to a game.
      */
     @SuppressWarnings("unused")
     public void move(int pos) throws ServerTimedOutException {
@@ -234,7 +230,6 @@ public class GameSocket implements Closeable {
      * @param playerName name of player to challenge
      * @param gameType the game to play
      * @throws ServerTimedOutException if the server times out.
-     * @throws ServerRuntimeException gets thrown when a server error occurs while trying to subscribe to a game.
      */
     @SuppressWarnings("unused")
     public void challenge(String playerName, String gameType) throws ServerTimedOutException {
@@ -257,7 +252,6 @@ public class GameSocket implements Closeable {
      * Accept a challenge (invite) from a player.
      * @param challengeId ID of the challenge
      * @throws ServerTimedOutException if the server times out.
-     * @throws ServerRuntimeException gets thrown when a server error occurs while trying to subscribe to a game.
      */
     @SuppressWarnings("unused")
     public void challengeAccept(int challengeId) throws ServerTimedOutException {
@@ -275,7 +269,6 @@ public class GameSocket implements Closeable {
     /**
      * Forfeit the current match.
      * @throws ServerTimedOutException if the server times out.
-     * @throws ServerRuntimeException gets thrown when a server error occurs while trying to subscribe to a game.
      */
     @SuppressWarnings("unused")
     public void forfeit() throws ServerTimedOutException {
