@@ -46,7 +46,6 @@ public class TicTacToeOnline {
         // Initialise
         this.gameSocket = gameSocket;
         this.player = player;
-        player.setIcon(Icon.CROSS);
 
         gameSocket.onMatchEvent.addListener(onMatch);
         gameSocket.onYourTurnEvent.addListener(onYourTurn);
@@ -79,11 +78,15 @@ public class TicTacToeOnline {
         System.out.println("Found match!\nPlaying against: " + opponentName);
 
         if (!data.get("PLAYERTOMOVE").equals(gameSocket.getPlayerName())) {   // If opponent has first move
+            player.setIcon(Icon.NOUGHT);
+
             System.out.println("\n" + opponentName + "'s turn");
             System.out.println(board);
             System.out.println("\n" + opponentName + " entering move...");
         }
         else {
+            player.setIcon(Icon.CROSS);
+
             synchronized (receivedOpponentMove) {
                 receivedOpponentMove.set(true);
                 receivedOpponentMove.notify();
