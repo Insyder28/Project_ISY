@@ -36,7 +36,7 @@ public class HumanPlayer implements Player {
         Scanner input = new Scanner(System.in);
 
         while (true) {
-            System.out.print("\nPlayer '" + icon + "', enter your move (column[1-3] row[1-3]): ");
+            System.out.print("\nPlayer '" + icon.getChar() + "', enter your move (column[1-3] row[1-3]): ");
             int col = input.nextInt() - 1;   // [0-2]
             int row = input.nextInt() - 1;
 
