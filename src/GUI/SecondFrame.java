@@ -1,19 +1,20 @@
-package gui;
+package GUI;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ThirdFrame extends JFrame implements ActionListener {
+public class SecondFrame extends JFrame implements ActionListener {
 
-    JButton ai = new JButton();
-    JButton human = new JButton();
+    JButton local = new JButton();
+    JButton online = new JButton();
+    JButton exit = new JButton();
     JLabel label = new JLabel();
     JButton back = new JButton();
-    JButton exit = new JButton();
-    String player;
+    String server;
 
-    ThirdFrame(){
+
+    SecondFrame(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setSize(720, 720);
@@ -22,20 +23,24 @@ public class ThirdFrame extends JFrame implements ActionListener {
         setLocationRelativeTo(null);
 
 
-        ai.setText("AI");
-        ai.addActionListener(this);
-        ai.setBounds(200, 300, 100, 50);
+        local.setText("Local");
+        local.addActionListener(this);
+        local.setBounds(200, 300, 100, 50);
 
-        human.setText("Human");
-        human.addActionListener(this);
-        human.setBounds(400, 300, 100, 50);
+        online.setText("Online");
+        online.addActionListener(this);
+        online.setBounds(400, 300, 100, 50);
 
         label.setBounds(250,200,200,100);
-        label.setText("Do you want to play or let AI play?");
+        label.setText("Do you want to play local or online?");
+
+        exit.setBounds(600, 20, 75, 75);
+        exit.setText("Exit");
+        exit.addActionListener(this);
 
         add(back);
-        add(human);
-        add(ai);
+        add(online);
+        add(local);
         add(label);
         add(exit);
 
@@ -50,21 +55,23 @@ public class ThirdFrame extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource()==ai){
+        if (e.getSource()==local){
             dispose();
-            player = "ai";
-            System.out.println(player);
+            new ThirdFrame();
+            server = "local";
+            System.out.println(server);
         }
 
-        if (e.getSource()==human){
+        if (e.getSource()==online){
             dispose();
-            player = "human";
-            System.out.println(player);
+            new ThirdFrameOnline();
+            server = "online";
+            System.out.println(server);
         }
 
         if(e.getSource()==back){
             dispose();
-            new SecondFrame();
+            new GUI();
         }
 
         if (e.getSource()==exit){

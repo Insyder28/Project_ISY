@@ -1,7 +1,4 @@
-package gui;
-
-import games.Board;
-import games.Icon;
+package GUI;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -15,7 +12,7 @@ public class GUI extends JFrame implements ActionListener {
     JButton exit = new JButton();
     TTTGui ttt = new TTTGui(this);
     String game;
-    public Icon icon;
+    public char icon;
 
     public GUI(){
         TTT.setBounds(200, 300, 100, 50);
@@ -42,10 +39,11 @@ public class GUI extends JFrame implements ActionListener {
         add(Othello);
         add(label);
         add(exit);
-
-        setVisible(true);
     }
 
+    public void MainFrame (){
+        setVisible(true);
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource()==TTT){
@@ -74,8 +72,8 @@ public class GUI extends JFrame implements ActionListener {
         JOptionPane.showMessageDialog(null, message, "End of game", JOptionPane.PLAIN_MESSAGE);
     }
 
-    public void setCurrentPlayer(Icon icon){
-        ttt.textField.setText(icon.getChar() + " turn");
+    public void setCurrentPlayer(char icon){
+        ttt.textField.setText(icon + " turn");
         this.icon = icon;
     }
 
@@ -85,7 +83,7 @@ public class GUI extends JFrame implements ActionListener {
         return ttt.buttonPressed.getMessage();
     }
 
-    public void updateBoard(Board board) {
+    public void updateBoard(char[][] board) {
         ttt.updateBoard(board);
     }
 

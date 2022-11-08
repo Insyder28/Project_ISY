@@ -1,6 +1,5 @@
 package networking;
 
-import threading.MessageBuffer;
 import events.Event;
 
 import java.io.Closeable;
@@ -300,7 +299,7 @@ public class GameSocket implements Closeable {
     }
 
     private String command(String command, boolean returnsData) throws ServerException {
-        MessageBuffer<String> responseBuffer = new MessageBuffer<>();
+        MessageBuffer responseBuffer = new MessageBuffer();
         serverStreamReader.bufferNextResponse(responseBuffer, returnsData);
         out.println(command);
 

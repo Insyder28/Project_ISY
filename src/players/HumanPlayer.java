@@ -2,18 +2,14 @@ package players;
 
 import games.Board;
 import games.Icon;
-import gui.GUI;
+
+import java.util.Scanner;
 
 /**
  * A player that lets a human decide its moves.
  */
 public class HumanPlayer implements Player {
     private Icon icon = Icon.NO_ICON;
-    private final GUI gui;
-
-    public HumanPlayer(GUI gui) {
-        this.gui = gui;
-    }
 
     /**
      * Setter for player icon.
@@ -37,27 +33,24 @@ public class HumanPlayer implements Player {
      * @return A move (1-8).
      */
     public int move(Board board) {
-        //Scanner input = new Scanner(System.in);
+        Scanner input = new Scanner(System.in);
 
         while (true) {
-//            System.out.print("\nPlayer '" + icon.getChar() + "', enter your move (column[1-3] row[1-3]): ");
-            int move = gui.getMove();
+            System.out.print("\nPlayer '" + icon.getChar() + "', enter your move (column[1-3] row[1-3]): ");
+            int col = input.nextInt() - 1;   // [0-2]
+            int row = input.nextInt() - 1;
 
-            if (!validateMove(move, board)) {
-                //System.out.println("Invalid Move");
+            if (!validateMove(row, col, board)) {
+                System.out.println("Invalid Move");
                 continue;
             }
 
-            return move;
+            return row * board.width + col;
         }
     }
 
-    private boolean validateMove(int move, Board board) {
-
-        int row = move / board.height;
-        int col = move % board.width;
-
-        if (move < 0 || move > 8) return false;
+    private boolean validateMove(int row, int col, Board board) {
+        if (row < 0 || row > 2 || col < 0 || col > 2) return false;
         return board.data[row][col] == Icon.NO_ICON;
     }
 }
