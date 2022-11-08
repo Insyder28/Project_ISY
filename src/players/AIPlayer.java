@@ -16,17 +16,30 @@ public class AIPlayer implements Player {
     protected int COLS;
     protected Icon[][] cells;
 
+    /** Getter for myIcon variable
+     *
+     * @return Icon myIcon
+     */
     @Override
     public Icon getIcon() {
         return myIcon;
     }
 
+    /** Setter for myIcon, automatically sets oppIcon as well
+     *
+     * @param icon Icon to be set for AI
+     */
     @Override
     public void setIcon(Icon icon) {
         this.myIcon = icon;
         oppIcon = (myIcon == Icon.CROSS) ? Icon.NOUGHT : Icon.CROSS;
     }
 
+    /** Move function that initializes the board used by the minimax function and calls the minimax function
+     *
+     * @param board The board on which the AI plays
+     * @return The best move the AI can make
+     */
     @Override
     public int move(Board board) {
         ROWS = board.height;
@@ -38,6 +51,14 @@ public class AIPlayer implements Player {
         return (results[1]) * ROWS + results[2];
     }
 
+    /** Recursively searches a tree down to a specific depth, and returns a list of integers containing the best score
+     * which is to be evaluated by the minimax function on the previous node, as well as the row and column that
+     * obtained that best score
+     *
+     * @param depth The depth of the search tree
+     * @param player The player whose turn it is, either myIcon or oppIcon
+     * @return List containing bestScore, bestRow, and bestCol
+     */
     private int[] minimax(int depth, Icon player) {
         List<int[]> nextMoves = generateMoves();
 
@@ -72,6 +93,10 @@ public class AIPlayer implements Player {
         return new int[] {bestScore, bestRow, bestCol};
     }
 
+    /** Generates a list of available moves, that the minimax function needs to recursively evaluate
+     *
+     * @return List of int[], containing all available row-column combinations
+     */
     private List<int[]> generateMoves() {
         List<int[]> nextMoves = new ArrayList<>(); // allocate List
 
@@ -197,6 +222,11 @@ public class AIPlayer implements Player {
 //        return score;
 //    }
 
+    /** Evaluation function that the minimax function calls to get a score for the current board
+     * Hardcoded at the moment, the more complex function that works for any board size is not functional at the moment
+     *
+     * @return The score of the current board
+     */
     private int evaluate() {
         int score = 0;
         // Evaluate score for each of the 8 lines (3 rows, 3 columns, 2 diagonals)
@@ -265,6 +295,10 @@ public class AIPlayer implements Player {
         return score;
     }
 
+    /** Checks whether the player has won
+     * @param icon The player to check
+     * @return True or False, depending on whether the player has won
+     */
     private boolean hasWon(Icon icon) {
         //Check all columns for 3 in a row of icon
         for (int row = 0; row < ROWS-2; row++) {
