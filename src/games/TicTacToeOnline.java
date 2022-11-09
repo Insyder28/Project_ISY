@@ -59,13 +59,14 @@ public class TicTacToeOnline {
         gameSocket.onDrawEvent.addListener(onDraw);
 
         // Subscribe to Tic-Tac-Toe
-        try {
-            System.out.println("Waiting for game...");
-            gameSocket.subscribe("tic-tac-toe");
-        }
-        catch (ServerTimedOutException e) {
-            onServerTimedOut(e);
-        }
+        System.out.println("Waiting for game...");
+//        try {
+//            System.out.println("Waiting for game...");
+//            gameSocket.subscribe("tic-tac-toe");
+//        }
+//        catch (ServerTimedOutException e) {
+//            onServerTimedOut(e);
+//        }
 
         // Sleep thread until game is finished
         synchronized (threadHolder) {
@@ -82,6 +83,7 @@ public class TicTacToeOnline {
         //System.out.println("Found match!\nPlaying against: " + opponentName);
 
         gui.setCurrentPlayer(Icon.CROSS);
+        gui.updateBoard(board);
 
         if (!data.get("PLAYERTOMOVE").equals(gameSocket.getPlayerName())) {   // If opponent has first move
             player.setIcon(Icon.NOUGHT);
@@ -144,19 +146,9 @@ public class TicTacToeOnline {
         board.set(Integer.parseInt(data.get("MOVE")), currentPlayer);   // Set the move on the board
 
         gui.updateBoard(board);
+        gui.setCurrentPlayer(currentPlayer);
 
-        if (ownMove) {
-            if (!checkWinner(currentPlayer) && count < 9) {
-//                System.out.println("\n" + opponentName + "'s turn");
-//                System.out.println(board);
-//                System.out.println("\n" + opponentName + " entering move...");
-
-                gui.setCurrentPlayer(player.getIcon().opponentIcon());
-            }
-        }
-        else {
-            gui.setCurrentPlayer(player.getIcon());
-
+        if (!ownMove) {
             // Set receivedOpponentMove to true
             synchronized (receivedOpponentMove) {
                 receivedOpponentMove.set(true);
@@ -188,17 +180,21 @@ public class TicTacToeOnline {
 
     private void endGame() {
         // Remove all listeners from events
-        gameSocket.onMatchEvent.removeListener(onMatch);
-        gameSocket.onYourTurnEvent.removeListener(onYourTurn);
-        gameSocket.onMoveEvent.removeListener(onMove);
-        gameSocket.onLossEvent.removeListener(onLoss);
-        gameSocket.onWinEvent.removeListener(onWin);
-        gameSocket.onDrawEvent.removeListener(onDraw);
+//        gameSocket.onMatchEvent.removeListener(onMatch);
+//        gameSocket.onYourTurnEvent.removeListener(onYourTurn);
+//        gameSocket.onMoveEvent.removeListener(onMove);
+//        gameSocket.onLossEvent.removeListener(onLoss);
+//        gameSocket.onWinEvent.removeListener(onWin);
+//        gameSocket.onDrawEvent.removeListener(onDraw);
 
         // Notify the object that holds the lock on the main thread.
-        synchronized (threadHolder) {
-            threadHolder.notify();
-        }
+//        synchronized (threadHolder) {
+//            threadHolder.notify();
+//        }
+
+        gui.setCurrentPlayer(Icon.NO_ICON);
+        System.out.println("end: \n" + board);
+        board.clear();
     }
 
     private void onServerTimedOut(Throwable e) {
@@ -217,36 +213,5 @@ public class TicTacToeOnline {
         }
 
         return map;
-    }
-
-
-    private boolean checkWinner(Icon icon) {
-        // Check rows
-        for (int i = 0; i < board.height; i++)
-            if (checkRow(i, icon)) return true;
-
-        // Check columns
-        for (int i = 0; i < board.width; i++) {
-            if (checkCol(i, icon)) return true;
-        }
-
-        // Check top-left to bottom-right
-        if (board.data[0][0] == icon && board.data[1][1] == icon && board.data[2][2] == icon)
-            return true;
-
-        // Check bottom-left to top right
-        return board.data[2][0] == icon && board.data[1][1] == icon && board.data[0][2] == icon;
-    }
-
-    private boolean checkRow(int index, Icon icon) {
-        for (Icon col : board.data[index])
-            if (col != icon) return false;
-        return true;
-    }
-
-    private boolean checkCol(int index, Icon icon) {
-        for (int i = 0; i < board.height; i++)
-            if (board.data[i][index] != icon) return false;
-        return true;
     }
 }

@@ -16,6 +16,7 @@ public class Main {
 
         try {
             gameSocket = new GameSocket(ip, port);
+            System.out.println("connected to: " + ip + ":" + port);
             gameSocket.login(playerName);
         }
         catch (Exception e) {
