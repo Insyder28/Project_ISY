@@ -59,14 +59,13 @@ public class TicTacToeOnline {
         gameSocket.onDrawEvent.addListener(onDraw);
 
         // Subscribe to Tic-Tac-Toe
-        System.out.println("Waiting for game...");
-//        try {
-//            System.out.println("Waiting for game...");
-//            gameSocket.subscribe("tic-tac-toe");
-//        }
-//        catch (ServerTimedOutException e) {
-//            onServerTimedOut(e);
-//        }
+        try {
+            System.out.println("Waiting for game...");
+            gameSocket.subscribe("tic-tac-toe");
+        }
+        catch (ServerTimedOutException e) {
+            onServerTimedOut(e);
+        }
 
         // Sleep thread until game is finished
         synchronized (threadHolder) {
@@ -180,17 +179,17 @@ public class TicTacToeOnline {
 
     private void endGame() {
         // Remove all listeners from events
-//        gameSocket.onMatchEvent.removeListener(onMatch);
-//        gameSocket.onYourTurnEvent.removeListener(onYourTurn);
-//        gameSocket.onMoveEvent.removeListener(onMove);
-//        gameSocket.onLossEvent.removeListener(onLoss);
-//        gameSocket.onWinEvent.removeListener(onWin);
-//        gameSocket.onDrawEvent.removeListener(onDraw);
+        gameSocket.onMatchEvent.removeListener(onMatch);
+        gameSocket.onYourTurnEvent.removeListener(onYourTurn);
+        gameSocket.onMoveEvent.removeListener(onMove);
+        gameSocket.onLossEvent.removeListener(onLoss);
+        gameSocket.onWinEvent.removeListener(onWin);
+        gameSocket.onDrawEvent.removeListener(onDraw);
 
         // Notify the object that holds the lock on the main thread.
-//        synchronized (threadHolder) {
-//            threadHolder.notify();
-//        }
+        synchronized (threadHolder) {
+            threadHolder.notify();
+        }
 
         gui.setCurrentPlayer(Icon.NO_ICON);
         System.out.println("end: \n" + board);

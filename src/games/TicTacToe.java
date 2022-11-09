@@ -1,5 +1,6 @@
 package games;
 
+import gui.GUI;
 import players.Player;
 
 public class TicTacToe {
@@ -11,7 +12,7 @@ public class TicTacToe {
     }
 
     @SuppressWarnings("unused")
-    public void startGame(Player xPlayer, Player oPlayer) {
+    public void startGame(Player xPlayer, Player oPlayer, GUI gui) {
         if (gameRunning) throw new RuntimeException("Game already running"); //TODO: create custom exception.
         gameRunning = true;
 
@@ -39,7 +40,9 @@ public class TicTacToe {
                 }
 
                 // Get move from player
+                gui.setCurrentPlayer(player.getIcon());
                 System.out.println("\n" + player.getIcon() + "'s turn\n" + board);
+                gui.updateBoard(board);
                 int pos = player.move(board);
 
                 // Validate
@@ -70,11 +73,14 @@ public class TicTacToe {
         if (winner == null) {
             System.out.println("\nDraw");
             System.out.println(board);
+            gui.updateBoard(board);
             return;
         }
 
         System.out.println("\nWinner is: '" + winner.getIcon() + "'");
         System.out.println(board);
+        gui.updateBoard(board);
+        gui.endGame("\nWinner is: '" + winner.getIcon() + "'");
         gameRunning = false;
     }
 
