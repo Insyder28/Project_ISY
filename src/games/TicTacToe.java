@@ -74,6 +74,7 @@ public class TicTacToe {
             System.out.println("\nDraw");
             System.out.println(board);
             gui.updateBoard(board);
+            gui.endGame("Draw");
             return;
         }
 
