@@ -1,0 +1,146 @@
+package networking;
+
+import events.EventListener;
+import games.OnlineGame;
+import games.OthelloOnline;
+import games.TicTacToeOnline;
+
+import java.io.Closeable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+public class MultiplayerConnection implements Closeable {
+    private GameSocket gameSocket;
+    private String playerName;
+
+    private OnlineGame currentGame;
+
+    final AtomicBoolean foundMatch = new AtomicBoolean(false);
+    final AtomicBoolean receivedOpponentMove = new AtomicBoolean(false);
+
+    // Create EventListener objects, so they can be removed from the events later
+    private final EventListener onMatch = this::onMatch;
+    private final EventListener onYourTurn = this::onYourTurn;
+    private final EventListener onMove = this::onMove;
+    private final EventListener onLoss = this::onLoss;
+    private final EventListener onWin = this::onWin;
+    private final EventListener onDraw = this::onDraw;
+
+    public MultiplayerConnection(GameSocket gameSocket) {
+        this.gameSocket = gameSocket;
+
+        this.gameSocket.onMatchEvent.addListener(onMatch);
+        this.gameSocket.onYourTurnEvent.addListener(onYourTurn);
+        this.gameSocket.onMoveEvent.addListener(onMove);
+        this.gameSocket.onLossEvent.addListener(onLoss);
+        this.gameSocket.onWinEvent.addListener(onWin);
+        this.gameSocket.onDrawEvent.addListener(onDraw);
+    }
+
+    public void subscribe(String gameType) {
+        try { gameSocket.subscribe(gameType); }
+        catch (ServerTimedOutException e) {
+            onServerTimeout(e);
+        }
+    }
+
+    @Override
+    public void close() {
+        this.gameSocket.onMatchEvent.removeListener(onMatch);
+        this.gameSocket.onYourTurnEvent.removeListener(onYourTurn);
+        this.gameSocket.onMoveEvent.removeListener(onMove);
+        this.gameSocket.onLossEvent.removeListener(onLoss);
+        this.gameSocket.onWinEvent.removeListener(onWin);
+        this.gameSocket.onDrawEvent.removeListener(onDraw);
+    }
+
+    private void onMatch(String args) {
+        Map<String, String> data = toMap(args);   // Create map from server data
+
+        switch (data.get("GAMETYPE")) {
+            case "Tic-tac-toe" -> currentGame = new TicTacToeOnline(gameSocket);
+            case "Othello" -> currentGame = new OthelloOnline(gameSocket);
+        }
+
+        currentGame.onMatch(args);
+
+        // Set foundMatch to true
+        synchronized (foundMatch) {
+            foundMatch.set(true);
+            foundMatch.notify();
+        }
+
+        // Set receivedOpponentMove to true when we have to do first move
+        if (data.get("PLAYERTOMOVE").equals(playerName)) {
+            synchronized (receivedOpponentMove) {
+                receivedOpponentMove.set(true);
+                receivedOpponentMove.notify();
+            }
+        }
+    }
+
+    private void onYourTurn(String args) {
+        // Check if onMatch event has been called. If not sleep thread until it is called.
+        synchronized (foundMatch) {
+            if (!foundMatch.get()) {
+                try { foundMatch.wait(); }
+                catch (InterruptedException ignored) { }
+            }
+        }
+
+        // Check if the opponent move has been set on the board before doing own move.
+        synchronized (receivedOpponentMove) {
+            if (!receivedOpponentMove.get()) {
+                try { receivedOpponentMove.wait(); }
+                catch (InterruptedException ignored) { }
+            }
+            receivedOpponentMove.set(false);
+        }
+
+        currentGame.onYourTurn(args);
+    }
+
+    private void onMove(String args) {
+        Map<String, String> data = toMap(args);   // Create map from server data
+
+        currentGame.onMove(args);
+
+        if (!data.get("PLAYER").equals(playerName)) {
+            // Set receivedOpponentMove to true
+            synchronized (receivedOpponentMove) {
+                receivedOpponentMove.set(true);
+                receivedOpponentMove.notify();
+            }
+        }
+    }
+
+    private void onLoss(String args) {
+        currentGame.onLoss(args);
+    }
+
+    private void onWin(String args) {
+        currentGame.onWin(args);
+    }
+
+    private void onDraw(String args) {
+        currentGame.onDraw(args);
+    }
+
+    private void onServerTimeout(Throwable e) {
+        gameSocket.close();
+    }
+
+    private Map<String, String> toMap(String s) {
+        Map<String, String> map = new HashMap<>();
+        String[] pairs = s.substring(1, s.length() - 2).split(", ");   // Create pairs, example of pair: 'KEY: "value"'
+
+        // Put pairs in map
+        for (String pair : pairs) {
+            String[] split = pair.split(": ");
+            map.put(split[0], split[1].substring(1, split[1].length() - 1));
+        }
+
+        return map;
+    }
+}

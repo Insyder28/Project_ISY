@@ -2,12 +2,10 @@ package games;
 
 import networking.GameSocket;
 
-import java.util.Map;
-
-public class TicTacToeOnline implements OnlineGame {
+public class OthelloOnline implements OnlineGame {
     private final GameSocket gameSocket;
 
-    public TicTacToeOnline(GameSocket gameSocket) {
+    public OthelloOnline(GameSocket gameSocket) {
         this.gameSocket = gameSocket;
     }
 

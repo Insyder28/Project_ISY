@@ -1,4 +1,4 @@
-import games.TicTacToeOnline;
+import games.TicTacToeOnlineOLD;
 import gui.GUI;
 import networking.GameSocket;
 import players.AIPlayer;
@@ -25,7 +25,7 @@ public class Main {
 
         GUI gui = new GUI();
 
-        TicTacToeOnline ticTacToeOnline = new TicTacToeOnline();
+        TicTacToeOnlineOLD ticTacToeOnline = new TicTacToeOnlineOLD();
         Player player = playerType.equals("AI") ? new AIPlayer() : new HumanPlayer(gui);
         ticTacToeOnline.startGame(player, gameSocket, gui);
 
