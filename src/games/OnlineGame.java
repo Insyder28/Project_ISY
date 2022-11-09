@@ -1,17 +1,19 @@
 package games;
 
+import networking.ServerTimedOutException;
+
 import java.util.Map;
 
 public interface OnlineGame {
-    void onMatch(String args);
+    void onMatch(Map<String, String> data);
 
-    void onYourTurn(String args);
+    void onYourTurn(Map<String, String> data) throws ServerTimedOutException;
 
-    void onMove(String args);
+    void onMove(Map<String, String> data);
 
-    void onLoss(String args);
+    void onLoss(Map<String, String> data);
 
-    void onWin(String args);
+    void onWin(Map<String, String> data);
 
-    void onDraw(String args);
+    void onDraw(Map<String, String> data);
 }

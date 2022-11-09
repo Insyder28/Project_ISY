@@ -2,17 +2,20 @@ package networking;
 
 import events.EventListener;
 import games.OnlineGame;
-import games.OthelloOnline;
 import games.TicTacToeOnline;
+import gui.GUI;
+import players.*;
 
 import java.io.Closeable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MultiplayerConnection implements Closeable {
+public class MultiplayerHandler implements Closeable {
     private GameSocket gameSocket;
+    private GUI gui;
     private String playerName;
+    private PlayerType playerType;
 
     private OnlineGame currentGame;
 
@@ -27,8 +30,10 @@ public class MultiplayerConnection implements Closeable {
     private final EventListener onWin = this::onWin;
     private final EventListener onDraw = this::onDraw;
 
-    public MultiplayerConnection(GameSocket gameSocket) {
+    public MultiplayerHandler(GameSocket gameSocket, PlayerType playerType, GUI gui) {
+        this.playerType = playerType;
         this.gameSocket = gameSocket;
+        this.gui = gui;
 
         this.gameSocket.onMatchEvent.addListener(onMatch);
         this.gameSocket.onYourTurnEvent.addListener(onYourTurn);
@@ -59,11 +64,11 @@ public class MultiplayerConnection implements Closeable {
         Map<String, String> data = toMap(args);   // Create map from server data
 
         switch (data.get("GAMETYPE")) {
-            case "Tic-tac-toe" -> currentGame = new TicTacToeOnline(gameSocket);
-            case "Othello" -> currentGame = new OthelloOnline(gameSocket);
+            case "Tic-tac-toe" -> startTicTacToe();
+            case "Othello" -> startOthello();
         }
 
-        currentGame.onMatch(args);
+        currentGame.onMatch(data);
 
         // Set foundMatch to true
         synchronized (foundMatch) {
@@ -72,7 +77,7 @@ public class MultiplayerConnection implements Closeable {
         }
 
         // Set receivedOpponentMove to true when we have to do first move
-        if (data.get("PLAYERTOMOVE").equals(playerName)) {
+        if (data.get("PLAYERTOMOVE").equals(gameSocket.getPlayerName())) {
             synchronized (receivedOpponentMove) {
                 receivedOpponentMove.set(true);
                 receivedOpponentMove.notify();
@@ -81,6 +86,8 @@ public class MultiplayerConnection implements Closeable {
     }
 
     private void onYourTurn(String args) {
+        Map<String, String> data = toMap(args);   // Create map from server data
+
         // Check if onMatch event has been called. If not sleep thread until it is called.
         synchronized (foundMatch) {
             if (!foundMatch.get()) {
@@ -98,13 +105,18 @@ public class MultiplayerConnection implements Closeable {
             receivedOpponentMove.set(false);
         }
 
-        currentGame.onYourTurn(args);
+        try {
+            currentGame.onYourTurn(data);
+        }
+        catch (ServerTimedOutException e) {
+            onServerTimeout(e);
+        }
     }
 
     private void onMove(String args) {
         Map<String, String> data = toMap(args);   // Create map from server data
 
-        currentGame.onMove(args);
+        currentGame.onMove(data);
 
         if (!data.get("PLAYER").equals(playerName)) {
             // Set receivedOpponentMove to true
@@ -116,15 +128,38 @@ public class MultiplayerConnection implements Closeable {
     }
 
     private void onLoss(String args) {
-        currentGame.onLoss(args);
+        Map<String, String> data = toMap(args);   // Create map from server data
+
+        currentGame.onLoss(data);
     }
 
     private void onWin(String args) {
-        currentGame.onWin(args);
+        Map<String, String> data = toMap(args);   // Create map from server data
+
+        currentGame.onWin(data);
     }
 
     private void onDraw(String args) {
-        currentGame.onDraw(args);
+        Map<String, String> data = toMap(args);   // Create map from server data
+
+        currentGame.onDraw(data);
+    }
+
+
+    private void startTicTacToe() {
+        Player player;
+
+        switch (playerType) {
+            case AI -> player = new AIPlayer();
+            case RANDOM -> player = new RandomPlayer();
+            default -> player = new HumanPlayer(gui);
+        }
+
+        currentGame = new TicTacToeOnline(player, gameSocket, gui);
+    }
+
+    private void startOthello() {
+
     }
 
     private void onServerTimeout(Throwable e) {
@@ -133,6 +168,7 @@ public class MultiplayerConnection implements Closeable {
 
     private Map<String, String> toMap(String s) {
         Map<String, String> map = new HashMap<>();
+        if (s.length() < 6) return map;   // No valid map can be made with less than 6 chars.
         String[] pairs = s.substring(1, s.length() - 2).split(", ");   // Create pairs, example of pair: 'KEY: "value"'
 
         // Put pairs in map

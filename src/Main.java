@@ -1,9 +1,7 @@
-import games.TicTacToeOnlineOLD;
 import gui.GUI;
 import networking.GameSocket;
-import players.AIPlayer;
-import players.HumanPlayer;
-import players.Player;
+import networking.MultiplayerHandler;
+import players.PlayerType;
 
 public class Main {
     public static void main(String[] args) {
@@ -25,11 +23,7 @@ public class Main {
 
         GUI gui = new GUI();
 
-        TicTacToeOnlineOLD ticTacToeOnline = new TicTacToeOnlineOLD();
-        Player player = playerType.equals("AI") ? new AIPlayer() : new HumanPlayer(gui);
-        ticTacToeOnline.startGame(player, gameSocket, gui);
-
-        System.out.println("\nDisconnecting...");
-        gameSocket.close();
+        MultiplayerHandler multiplayerHandler = new MultiplayerHandler(gameSocket, PlayerType.HUMAN, gui);
+        multiplayerHandler.subscribe("tic-tac-toe");
     }
 }
