@@ -1,6 +1,8 @@
+import games.TicTacToe;
 import gui.GUI;
 import networking.GameSocket;
 import networking.MultiplayerHandler;
+import players.HumanPlayer;
 import players.PlayerType;
 
 public class Main {
@@ -23,7 +25,10 @@ public class Main {
 
         GUI gui = new GUI();
 
-        MultiplayerHandler multiplayerHandler = new MultiplayerHandler(gameSocket, PlayerType.HUMAN, gui);
-        multiplayerHandler.subscribe("tic-tac-toe");
+        //MultiplayerHandler multiplayerHandler = new MultiplayerHandler(gameSocket);
+        //multiplayerHandler.subscribe("tic-tac-toe");
+
+        TicTacToe ticTacToe = new TicTacToe();
+        ticTacToe.startGame(new HumanPlayer(), new HumanPlayer());
     }
 }

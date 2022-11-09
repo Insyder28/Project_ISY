@@ -15,7 +15,6 @@ public class MultiplayerHandler implements Closeable {
     private GameSocket gameSocket;
     private GUI gui;
     private String playerName;
-    private PlayerType playerType;
 
     private OnlineGame currentGame;
 
@@ -30,10 +29,9 @@ public class MultiplayerHandler implements Closeable {
     private final EventListener onWin = this::onWin;
     private final EventListener onDraw = this::onDraw;
 
-    public MultiplayerHandler(GameSocket gameSocket, PlayerType playerType, GUI gui) {
-        this.playerType = playerType;
+    public MultiplayerHandler(GameSocket gameSocket) {
+        this.gui = GUI.getInstance();
         this.gameSocket = gameSocket;
-        this.gui = gui;
 
         this.gameSocket.onMatchEvent.addListener(onMatch);
         this.gameSocket.onYourTurnEvent.addListener(onYourTurn);
@@ -147,15 +145,16 @@ public class MultiplayerHandler implements Closeable {
 
 
     private void startTicTacToe() {
+        PlayerType playerType = gui.getSelectedPlayerType();
         Player player;
 
         switch (playerType) {
             case AI -> player = new AIPlayer();
             case RANDOM -> player = new RandomPlayer();
-            default -> player = new HumanPlayer(gui);
+            default -> player = new HumanPlayer();
         }
 
-        currentGame = new TicTacToeOnline(player, gameSocket, gui);
+        currentGame = new TicTacToeOnline(player, gameSocket);
     }
 
     private void startOthello() {

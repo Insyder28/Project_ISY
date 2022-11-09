@@ -11,8 +11,8 @@ public class HumanPlayer implements Player {
     private Icon icon = Icon.NO_ICON;
     private final GUI gui;
 
-    public HumanPlayer(GUI gui) {
-        this.gui = gui;
+    public HumanPlayer() {
+        this.gui = GUI.getInstance();
     }
 
     /**

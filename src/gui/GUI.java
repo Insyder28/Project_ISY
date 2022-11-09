@@ -2,12 +2,20 @@ package gui;
 
 import games.Board;
 import games.Icon;
+import players.PlayerType;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class GUI extends JFrame implements ActionListener {
+
+    private static GUI instance = null;
+    public static GUI getInstance() {
+        if (instance == null) throw new InstanceNotFoundException();
+        return instance;
+    }
+
 
     JButton TTT = new JButton();
     JButton Othello = new JButton();
@@ -18,6 +26,9 @@ public class GUI extends JFrame implements ActionListener {
     public Icon icon = Icon.NO_ICON;
 
     public GUI(){
+        if (instance != null) throw new InstanceAlreadyExistsException();
+        instance = this;
+
         TTT.setBounds(200, 300, 100, 50);
         TTT.addActionListener(this);
         TTT.setText("TicTacToe");
@@ -81,6 +92,11 @@ public class GUI extends JFrame implements ActionListener {
         setCurrentPlayer(icon);
         ttt.buttonPressed.awaitMessage();
         return ttt.buttonPressed.getMessage();
+    }
+
+    public PlayerType getSelectedPlayerType() {
+        //TODO: finish method
+        return PlayerType.HUMAN;
     }
 
     public void updateBoard(Board board) {

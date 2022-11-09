@@ -13,10 +13,10 @@ public class TicTacToeOnline implements OnlineGame {
     private final Player player;
     private final GUI gui;
 
-    public TicTacToeOnline(Player player, GameSocket gameSocket, GUI gui) {
+    public TicTacToeOnline(Player player, GameSocket gameSocket) {
+        this.gui = GUI.getInstance();
         this.player = player;
         this.gameSocket = gameSocket;
-        this.gui = gui;
     }
 
     @Override

@@ -11,10 +11,10 @@ public class OthelloOnline implements OnlineGame {
     private final GUI gui;
     private final Player player;
 
-    public OthelloOnline(Player player, GameSocket gameSocket, GUI gui) {
+    public OthelloOnline(Player player, GameSocket gameSocket) {
+        this.gui = GUI.getInstance();
         this.player = player;
         this.gameSocket = gameSocket;
-        this.gui = gui;
     }
 
     @Override
