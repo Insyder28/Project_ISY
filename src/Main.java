@@ -10,7 +10,6 @@ public class Main {
         String ip = args[0];
         int port = Integer.parseInt(args[1]);
         String playerName = args[2];
-        String playerType = args[3];
 
         GameSocket gameSocket;
 
@@ -23,12 +22,9 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-        GUI gui = new GUI();
+        new GUI();
 
-        //MultiplayerHandler multiplayerHandler = new MultiplayerHandler(gameSocket);
-        //multiplayerHandler.subscribe("tic-tac-toe");
-
-        TicTacToe ticTacToe = new TicTacToe();
-        ticTacToe.startGame(new HumanPlayer(), new HumanPlayer());
+        MultiplayerHandler multiplayerHandler = new MultiplayerHandler(gameSocket);
+        multiplayerHandler.subscribe("tic-tac-toe");
     }
 }
