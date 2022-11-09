@@ -17,11 +17,7 @@ public class TTTGui extends JFrame implements ActionListener {
     public JButton[] grid = new JButton[9];
     public MessageBuffer<Integer> buttonPressed = new MessageBuffer<>();
 
-    private final GUI mainGUI;
-
-    TTTGui(GUI mainGUI) {
-        this.mainGUI = mainGUI;
-
+    TTTGui() {
         setTitle("TicTacToe");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(720, 720);
@@ -79,14 +75,12 @@ public class TTTGui extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         for (int i = 0; i < 9; i++) {
-            if (mainGUI.icon.getChar() == 'X') {
-                if (e.getSource() == grid[i]) {
-//                    if (grid[i].getText() == "") {
-//                        grid[i].setForeground(new Color(255, 0, 0));
-//                        grid[i].setText("X");
-                    buttonPressed.setMessage(i);
+            if (e.getSource() == grid[i]) {
+//                if (grid[i].getText() == "") {
+//                    grid[i].setForeground(new Color(255, 0, 0));
+//                    grid[i].setText("X");
+                buttonPressed.setMessage(i);
 
-                }
             }
 //            else {
 //                if (e.getSource() == grid[i]) {

@@ -79,19 +79,19 @@ public class TicTacToeOnline {
     private void onMatch(String args) {
         Map<String, String> data = toMap(args);   // Create map from server data
         opponentName = data.get("OPPONENT");
-        System.out.println("Found match!\nPlaying against: " + opponentName);
+        //System.out.println("Found match!\nPlaying against: " + opponentName);
+
+        gui.setCurrentPlayer(Icon.CROSS);
 
         if (!data.get("PLAYERTOMOVE").equals(gameSocket.getPlayerName())) {   // If opponent has first move
             player.setIcon(Icon.NOUGHT);
-            gui.setCurrentPlayer(Icon.NOUGHT);
 
-            System.out.println("\n" + opponentName + "'s turn");
-            System.out.println(board);
-            System.out.println("\n" + opponentName + " entering move...");
+//            System.out.println("\n" + opponentName + "'s turn");
+//            System.out.println(board);
+//            System.out.println("\n" + opponentName + " entering move...");
         }
         else {
             player.setIcon(Icon.CROSS);
-            gui.setCurrentPlayer(Icon.CROSS);
 
             synchronized (receivedOpponentMove) {
                 receivedOpponentMove.set(true);
@@ -107,6 +107,8 @@ public class TicTacToeOnline {
     }
 
     private void onYourTurn(String args) {
+        System.out.println(args);
+
         // Check if onMatch event has been called. If not sleep thread until it is called.
         synchronized (foundMatch) {
             if (!foundMatch.get()) {
@@ -127,7 +129,6 @@ public class TicTacToeOnline {
         // Send the move to the server
         try {
             //System.out.println("\nYour turn\n" + board);
-            gui.setCurrentPlayer(player.getIcon());
             gameSocket.move(player.move(board));
         }
         catch (ServerTimedOutException e) {
@@ -144,17 +145,20 @@ public class TicTacToeOnline {
         Icon currentPlayer = ownMove ? player.getIcon() : player.getIcon().opponentIcon();   // Get the icon of the current player
         board.set(Integer.parseInt(data.get("MOVE")), currentPlayer);   // Set the move on the board
 
+        gui.updateBoard(board);
+
         if (ownMove) {
             if (!checkWinner(currentPlayer) && count < 9) {
 //                System.out.println("\n" + opponentName + "'s turn");
 //                System.out.println(board);
 //                System.out.println("\n" + opponentName + " entering move...");
 
-                gui.updateBoard(board);
                 gui.setCurrentPlayer(player.getIcon().opponentIcon());
             }
         }
         else {
+            gui.setCurrentPlayer(player.getIcon());
+
             // Set receivedOpponentMove to true
             synchronized (receivedOpponentMove) {
                 receivedOpponentMove.set(true);
@@ -165,18 +169,21 @@ public class TicTacToeOnline {
 
     private void onLoss(String args) {
         //System.out.println("\nYou lost\n" + board);
+        gui.updateBoard(board);
         gui.endGame("You lost");
         endGame();
     }
 
     private void onWin(String args) {
         //System.out.println("\nYou won!\n" + board);
+        gui.updateBoard(board);
         gui.endGame("You won!");
         endGame();
     }
 
     private void onDraw(String args) {
         //System.out.println("\nIt's a draw\n" + board);
+        gui.updateBoard(board);
         gui.endGame("It's a draw");
         endGame();
     }

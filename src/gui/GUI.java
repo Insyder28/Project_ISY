@@ -13,9 +13,9 @@ public class GUI extends JFrame implements ActionListener {
     JButton Othello = new JButton();
     JLabel label = new JLabel();
     JButton exit = new JButton();
-    TTTGui ttt = new TTTGui(this);
+    TTTGui ttt = new TTTGui();
     String game;
-    public Icon icon;
+    public Icon icon = Icon.NO_ICON;
 
     public GUI(){
         TTT.setBounds(200, 300, 100, 50);
@@ -54,14 +54,12 @@ public class GUI extends JFrame implements ActionListener {
             game = "TicTacToe";
             System.out.println(game);
             ttt.MainFrame();
-
         }
 
         if(e.getSource()==Othello){
             dispose();
             new SecondFrame();
             game = "Othello";
-            System.out.println(game);
 
         }
 
