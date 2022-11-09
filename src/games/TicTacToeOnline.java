@@ -107,8 +107,6 @@ public class TicTacToeOnline {
     }
 
     private void onYourTurn(String args) {
-        System.out.println(args);
-
         // Check if onMatch event has been called. If not sleep thread until it is called.
         synchronized (foundMatch) {
             if (!foundMatch.get()) {

@@ -25,9 +25,7 @@ public class Main {
         GUI gui = new GUI();
 
         TicTacToeOnline ticTacToeOnline = new TicTacToeOnline();
-
         Player player = playerType.equals("AI") ? new AIPlayer() : new HumanPlayer(gui);
-
         ticTacToeOnline.startGame(player, gameSocket, gui);
 
         System.out.println("\nDisconnecting...");
