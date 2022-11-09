@@ -5,6 +5,7 @@ import games.OnlineGame;
 import games.TicTacToeOnline;
 import gui.GUI;
 import players.*;
+import threading.Trigger;
 
 import java.io.Closeable;
 import java.util.HashMap;
@@ -18,8 +19,8 @@ public class MultiplayerHandler implements Closeable {
 
     private OnlineGame currentGame;
 
-    final AtomicBoolean foundMatch = new AtomicBoolean(false);
-    final AtomicBoolean receivedOpponentMove = new AtomicBoolean(false);
+    final Trigger foundMatch = new Trigger(false);
+    final Trigger receivedOpponentMove = new Trigger(false);
 
     // Create EventListener objects, so they can be removed from the events later
     private final EventListener onMatch = this::onMatch;
@@ -69,39 +70,22 @@ public class MultiplayerHandler implements Closeable {
         currentGame.onMatch(data);
 
         // Set foundMatch to true
-        synchronized (foundMatch) {
-            foundMatch.set(true);
-            foundMatch.notify();
-        }
+        foundMatch.set(true);
 
         // Set receivedOpponentMove to true when we have to do first move
-        if (data.get("PLAYERTOMOVE").equals(gameSocket.getPlayerName())) {
-            synchronized (receivedOpponentMove) {
-                receivedOpponentMove.set(true);
-                receivedOpponentMove.notify();
-            }
-        }
+        if (data.get("PLAYERTOMOVE").equals(gameSocket.getPlayerName()))
+            receivedOpponentMove.set(true);
     }
 
     private void onYourTurn(String args) {
         Map<String, String> data = toMap(args);   // Create map from server data
 
         // Check if onMatch event has been called. If not sleep thread until it is called.
-        synchronized (foundMatch) {
-            if (!foundMatch.get()) {
-                try { foundMatch.wait(); }
-                catch (InterruptedException ignored) { }
-            }
-        }
+        foundMatch.await();
 
         // Check if the opponent move has been set on the board before doing own move.
-        synchronized (receivedOpponentMove) {
-            if (!receivedOpponentMove.get()) {
-                try { receivedOpponentMove.wait(); }
-                catch (InterruptedException ignored) { }
-            }
-            receivedOpponentMove.set(false);
-        }
+        receivedOpponentMove.await();
+        receivedOpponentMove.set(false);
 
         try {
             currentGame.onYourTurn(data);
@@ -116,13 +100,8 @@ public class MultiplayerHandler implements Closeable {
 
         currentGame.onMove(data);
 
-        if (!data.get("PLAYER").equals(playerName)) {
-            // Set receivedOpponentMove to true
-            synchronized (receivedOpponentMove) {
-                receivedOpponentMove.set(true);
-                receivedOpponentMove.notify();
-            }
-        }
+        if (!data.get("PLAYER").equals(playerName))
+            receivedOpponentMove.set(true);
     }
 
     private void onLoss(String args) {
