@@ -6,6 +6,7 @@ import gui.GUI;
 
 /**
  * A player that lets a human decide its moves.
+ * @author Erwin Veenhoven
  */
 public class HumanPlayer implements Player {
     private Icon icon = Icon.NO_ICON;

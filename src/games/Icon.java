@@ -2,6 +2,7 @@ package games;
 
 /**
  * Represents an icon that can be placed on a {@link Board}.
+ * @author Hindrik Kroes
  */
 public enum Icon {
     CROSS('X'), NOUGHT('O'), NO_ICON(' ');

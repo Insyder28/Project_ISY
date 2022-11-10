@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MultiplayerHandler implements Closeable {
-    private GameSocket gameSocket;
-    private GUI gui;
+    private final GameSocket gameSocket;
+    private final GUI gui;
     private String playerName;
 
     private OnlineGame currentGame;
