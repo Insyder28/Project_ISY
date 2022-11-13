@@ -17,40 +17,40 @@ public class GUI extends JFrame implements ActionListener {
     }
 
 
-    JButton TTT = new JButton();
-    JButton Othello = new JButton();
+    JButton local = new JButton();
+    JButton online = new JButton();
+
     JLabel label = new JLabel();
     JButton exit = new JButton();
-    TTTGui ttt = new TTTGui();
-    String game;
     public Icon icon = Icon.NO_ICON;
+    TTTGui ttt = new TTTGui();
 
     public GUI(){
         if (instance != null) throw new InstanceAlreadyExistsException();
         instance = this;
 
-        TTT.setBounds(200, 300, 100, 50);
-        TTT.addActionListener(this);
-        TTT.setText("TicTacToe");
+        local.setBounds(200, 300, 100, 50);
+        local.addActionListener(this);
+        local.setText("Local");
 
-        Othello.setBounds(400, 300, 100, 50);
-        Othello.addActionListener(this);
-        Othello.setText("Othello");
+        online.setBounds(400, 300, 100, 50);
+        online.addActionListener(this);
+        online.setText("Online");
 
         exit.setBounds(600, 20, 75, 75);
         exit.setText("Exit");
         exit.addActionListener(this);
 
         label.setBounds(300,200,200,100);
-        label.setText("Choose a game to play!");
+        label.setText("How do you want to play?");
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setSize(720, 720);
         setTitle("Game Launcher");
         setLocationRelativeTo(null);
-        add(TTT);
-        add(Othello);
+        add(local);
+        add(online);
         add(label);
         add(exit);
 
@@ -59,18 +59,14 @@ public class GUI extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource()==TTT){
+        if(e.getSource()==local){
             dispose();
-            new SecondFrame();
-            game = "TicTacToe";
-            System.out.println(game);
-            ttt.MainFrame();
+            new PlayerXLocal();
         }
 
-        if(e.getSource()==Othello){
+        if(e.getSource()== online){
             dispose();
-            new SecondFrame();
-            game = "Othello";
+            new SelectPlayerOnline();
 
         }
 

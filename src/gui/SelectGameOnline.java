@@ -4,17 +4,15 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class SecondFrame extends JFrame implements ActionListener {
+public class SelectGameOnline extends JFrame implements ActionListener {
 
-    JButton local = new JButton();
-    JButton online = new JButton();
-    JButton exit = new JButton();
+    JButton ai = new JButton();
+    JButton human = new JButton();
     JLabel label = new JLabel();
+    JButton exit = new JButton();
     JButton back = new JButton();
-    String server;
 
-
-    SecondFrame(){
+    SelectGameOnline(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setSize(720, 720);
@@ -23,55 +21,46 @@ public class SecondFrame extends JFrame implements ActionListener {
         setLocationRelativeTo(null);
 
 
-        local.setText("Local");
-        local.addActionListener(this);
-        local.setBounds(200, 300, 100, 50);
+        ai.setText("Tick Tack Toe");
+        ai.addActionListener(this);
+        ai.setBounds(200, 300, 100, 50);
 
-        online.setText("Online");
-        online.addActionListener(this);
-        online.setBounds(400, 300, 100, 50);
+        human.setText("Othello");
+        human.addActionListener(this);
+        human.setBounds(400, 300, 100, 50);
 
         label.setBounds(250,200,200,100);
-        label.setText("Do you want to play local or online?");
+        label.setText("Choose a game to subscribe to");
 
         exit.setBounds(600, 20, 75, 75);
         exit.setText("Exit");
         exit.addActionListener(this);
 
+
         add(back);
-        add(online);
-        add(local);
+        add(human);
+        add(ai);
         add(label);
         add(exit);
 
         back.setBounds(20, 20, 75, 75);
         back.setText("Return");
         back.addActionListener(this);
-
-        exit.setBounds(600, 20, 75, 75);
-        exit.setText("Exit");
-        exit.addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource()==local){
+        if (e.getSource()==ai){
             dispose();
-            new ThirdFrame();
-            server = "local";
-            System.out.println(server);
         }
 
-        if (e.getSource()==online){
+        if (e.getSource()==human){
             dispose();
-            new ThirdFrameOnline();
-            server = "online";
-            System.out.println(server);
         }
 
         if(e.getSource()==back){
             dispose();
-            new GUI();
+            new SelectPlayerOnline();
         }
 
         if (e.getSource()==exit){
