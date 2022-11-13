@@ -10,13 +10,14 @@ import java.awt.event.ActionListener;
 
 public class GUI extends JFrame implements ActionListener {
 
+    // Singleton logic
     private static GUI instance = null;
     public static GUI getInstance() {
         if (instance == null) throw new InstanceNotFoundException();
         return instance;
     }
 
-
+    // instance fields
     JButton local = new JButton();
     JButton online = new JButton();
 
@@ -25,6 +26,7 @@ public class GUI extends JFrame implements ActionListener {
     public Icon icon = Icon.NO_ICON;
     TTTGui ttt = new TTTGui();
 
+    // constructor
     public GUI(){
         if (instance != null) throw new InstanceAlreadyExistsException();
         instance = this;
@@ -57,6 +59,7 @@ public class GUI extends JFrame implements ActionListener {
         setVisible(true);
     }
 
+    // methods
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource()==local){
