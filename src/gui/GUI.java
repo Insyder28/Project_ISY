@@ -1,12 +1,9 @@
 package gui;
 
-import games.Board;
 import games.GameType;
 import games.Icon;
 import games.Mode;
 import players.PlayerType;
-
-import javax.swing.*;
 
 public class GUI {
     // Singleton logic
@@ -56,5 +53,11 @@ public class GUI {
         TicTacToeGUI gui = new TicTacToeGUI();
         this.ticTacToeGUI = gui;
         return gui;
+    }
+
+    public void dispose() {
+        selectPlayerTypeWindow.dispose();
+        selectGameWindow.dispose();
+        selectModeWindow.dispose();
     }
 }

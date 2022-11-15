@@ -14,6 +14,7 @@ public class TicTacToeGUI extends JFrame implements ActionListener {
     public JPanel title_panel = new JPanel();
     public JLabel textField = new JLabel();
     public JButton[] grid = new JButton[9];
+
     public Buffer<Integer> buttonPressed = new Buffer<>();
 
     public TicTacToeGUI() {
@@ -53,7 +54,15 @@ public class TicTacToeGUI extends JFrame implements ActionListener {
     }
 
     public void endGame(String message) {
-        JOptionPane.showMessageDialog(null, message, "End of game", JOptionPane.PLAIN_MESSAGE);
+        JOptionPane optionPane = new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE);
+        JDialog dialog = optionPane.createDialog("End of game");
+        dialog.setVisible(true);
+
+        Object ignored = optionPane.getValue();   // Wait till user presses ok or closes pop-up
+        dialog.dispose();
+
+        GUI.getInstance().dispose();
+        dispose();
     }
 
     public void setCurrentPlayer(Icon icon) {
