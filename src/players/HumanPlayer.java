@@ -3,6 +3,7 @@ package players;
 import games.Board;
 import games.Icon;
 import gui.GUI;
+import gui.TicTacToeGUI;
 
 /**
  * A player that lets a human decide its moves.
@@ -10,11 +11,7 @@ import gui.GUI;
  */
 public class HumanPlayer implements Player {
     private Icon icon = Icon.NO_ICON;
-    private final GUI gui;
-
-    public HumanPlayer() {
-        this.gui = GUI.getInstance();
-    }
+    private final GUI gui = GUI.getInstance();
 
     /**
      * Setter for player icon.
@@ -42,7 +39,7 @@ public class HumanPlayer implements Player {
 
         while (true) {
 //            System.out.print("\nPlayer '" + icon.getChar() + "', enter your move (column[1-3] row[1-3]): ");
-            int move = gui.getMove();
+            int move = gui.getTicTacToeGUI().getMove();
 
             if (!validateMove(move, board)) {
                 //System.out.println("Invalid Move");

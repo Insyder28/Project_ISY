@@ -1,30 +1,30 @@
 package gui;
 
+import games.GameType;
+import threading.Buffer;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class SelectGame extends JFrame implements ActionListener {
+class SelectGameWindow extends JFrame implements ActionListener {
+    private Buffer<GameType> gameTypeBuffer = new Buffer<>();
 
-    JButton TTT = new JButton();
+    JButton ttt = new JButton();
     JButton Othello = new JButton();
     JLabel label = new JLabel();
     JButton back = new JButton();
     JButton exit = new JButton();
-    TTTGui ttt = new TTTGui();
 
-    SelectGame(){
+    SelectGameWindow(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setSize(720, 720);
-        setVisible(true);
         setTitle("Game Launcher");
-        setLocationRelativeTo(null);
 
-
-        TTT.setText("Tick Tack Toe");
-        TTT.addActionListener(this);
-        TTT.setBounds(200, 300, 100, 50);
+        ttt.setText("Tick Tack Toe");
+        ttt.addActionListener(this);
+        ttt.setBounds(200, 300, 100, 50);
 
         Othello.setText("Orthello");
         Othello.addActionListener(this);
@@ -35,7 +35,7 @@ public class SelectGame extends JFrame implements ActionListener {
 
         add(back);
         add(Othello);
-        add(TTT);
+        add(ttt);
         add(label);
         add(exit);
 
@@ -50,22 +50,28 @@ public class SelectGame extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource()== TTT){
-            dispose();
-            ttt.MainFrame();
+        if (e.getSource()== ttt){
+            gameTypeBuffer.set(GameType.TICTACTOE);
+            setVisible(false);
         }
 
         if (e.getSource()== Othello){
-            dispose();
+            gameTypeBuffer.set(GameType.OTHELLO);
+            setVisible(false);
         }
 
         if(e.getSource()==back){
-            dispose();
-            new SelectPlayerOnline();
+            setVisible(false);
         }
 
         if (e.getSource()==exit){
-            dispose();
+            setVisible(false);
         }
+    }
+
+    public GameType getGameType() {
+        setLocationRelativeTo(null);
+        setVisible(true);
+        return gameTypeBuffer.await();
     }
 }

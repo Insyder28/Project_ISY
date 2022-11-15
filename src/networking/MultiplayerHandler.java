@@ -3,18 +3,17 @@ package networking;
 import events.EventListener;
 import games.OnlineGame;
 import games.TicTacToeOnline;
-import gui.GUI;
 import players.*;
 import threading.Trigger;
 
 import java.io.Closeable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MultiplayerHandler implements Closeable {
     private final GameSocket gameSocket;
-    private final GUI gui;
+
+    private PlayerType playerType;
     private String playerName;
 
     private OnlineGame currentGame;
@@ -30,9 +29,9 @@ public class MultiplayerHandler implements Closeable {
     private final EventListener onWin = this::onWin;
     private final EventListener onDraw = this::onDraw;
 
-    public MultiplayerHandler(GameSocket gameSocket) {
-        this.gui = GUI.getInstance();
+    public MultiplayerHandler(GameSocket gameSocket, PlayerType playerType) {
         this.gameSocket = gameSocket;
+        this.playerType = playerType;
 
         this.gameSocket.onMatchEvent.addListener(onMatch);
         this.gameSocket.onYourTurnEvent.addListener(onYourTurn);
@@ -124,7 +123,6 @@ public class MultiplayerHandler implements Closeable {
 
 
     private void startTicTacToe() {
-        PlayerType playerType = gui.getSelectedPlayerType();
         Player player;
 
         switch (playerType) {

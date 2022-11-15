@@ -1,6 +1,6 @@
 package networking;
 
-import threading.MessageBuffer;
+import threading.Buffer;
 import events.EventListener;
 
 import java.io.Closeable;
@@ -19,7 +19,7 @@ public class ServerStreamReader implements Closeable {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    private MessageBuffer<String> messageBuffer;
+    private Buffer<String> messageBuffer;
     private volatile boolean bufferResponse;
     private volatile boolean isDataResponse;
     private boolean receivedOk;
@@ -43,7 +43,7 @@ public class ServerStreamReader implements Closeable {
      * @param buffer The buffer to store the response in.
      */
     @SuppressWarnings("unused")
-    public void bufferNextResponse(MessageBuffer<String> buffer) {
+    public void bufferNextResponse(Buffer<String> buffer) {
         bufferNextResponse(buffer, false);
     }
 
@@ -52,7 +52,7 @@ public class ServerStreamReader implements Closeable {
      * @param buffer The buffer to store the response in.
      * @param isDataResponse Set to true when the response contains data.
      */
-    public void bufferNextResponse(MessageBuffer<String> buffer, boolean isDataResponse) {
+    public void bufferNextResponse(Buffer<String> buffer, boolean isDataResponse) {
         this.messageBuffer = buffer;
 
         this.bufferResponse = true;
@@ -107,7 +107,7 @@ public class ServerStreamReader implements Closeable {
                 if (message.startsWith("ERR")) {
                     isDataResponse = false;
                     bufferResponse = false;
-                    messageBuffer.setMessage(message);
+                    messageBuffer.set(message);
                 }
                 else if (message.startsWith("OK")) {
                     isDataResponse = false;
@@ -115,7 +115,7 @@ public class ServerStreamReader implements Closeable {
                 }
             }
             else if (message.startsWith("OK") || message.startsWith("ERR") || (message.startsWith("SVR") && receivedOk)) {
-                messageBuffer.setMessage(message);
+                messageBuffer.set(message);
                 bufferResponse = false;
             }
         }

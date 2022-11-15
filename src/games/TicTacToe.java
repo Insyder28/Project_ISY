@@ -1,15 +1,15 @@
 package games;
 
 import gui.GUI;
+import gui.TicTacToeGUI;
 import players.Player;
 
 public class TicTacToe {
     private final Board board;
     private boolean gameRunning = false;
-    private GUI gui;
+    private TicTacToeGUI ticTacToeGUI;
 
     public TicTacToe () {
-        this.gui = GUI.getInstance();
         board = new Board(3, 3);
     }
 
@@ -17,6 +17,8 @@ public class TicTacToe {
     public void startGame(Player xPlayer, Player oPlayer) {
         if (gameRunning) throw new RuntimeException("Game already running"); //TODO: create custom exception.
         gameRunning = true;
+
+        ticTacToeGUI = GUI.getInstance().startTicTacToe();
 
         // Setup
         board.clear();
@@ -43,8 +45,8 @@ public class TicTacToe {
 
                 // Get move from player
                 System.out.println("\n" + player.getIcon() + "'s turn\n" + board);
-                gui.updateBoard(board);
-                gui.setCurrentPlayer(player.getIcon());
+                ticTacToeGUI.updateBoard(board);
+                ticTacToeGUI.setCurrentPlayer(player.getIcon());
                 int pos = player.move(board);
 
                 // Validate
@@ -75,15 +77,15 @@ public class TicTacToe {
         if (winner == null) {
             System.out.println("\nDraw");
             System.out.println(board);
-            gui.updateBoard(board);
-            gui.endGame("It's a draw");
+            ticTacToeGUI.updateBoard(board);
+            ticTacToeGUI.endGame("It's a draw");
             return;
         }
 
         System.out.println("\nWinner is: '" + winner.getIcon().getChar() + "'");
         System.out.println(board);
-        gui.updateBoard(board);
-        gui.endGame("Winner is: '" + winner.getIcon().getChar() + "'");
+        ticTacToeGUI.updateBoard(board);
+        ticTacToeGUI.endGame("Winner is: '" + winner.getIcon().getChar() + "'");
         gameRunning = false;
     }
 

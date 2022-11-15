@@ -1,38 +1,40 @@
 package threading;
 
 /**
- * A thread save buffer for messages.
+ * A thread save buffer.
  */
-public class MessageBuffer<T> {
-    T message;
+public class Buffer<T> {
+    T object;
     private volatile boolean notified = false;
 
     /**
      * Set a message and call {@link #notify()} on object in a thread safe manner.
-     * @param message the message
+     * @param object the message
      */
-    synchronized public void setMessage(T message) {
-        this.message = message;
+    synchronized public void set(T object) {
+        this.object = object;
         this.notified = true;
         this.notify();
     }
 
     /**
-     * @return current message stored in buffer.
+     * @return current object stored in buffer.
      */
     @SuppressWarnings("unused")
-    synchronized public T getMessage() {
-        return message;
+    synchronized public T get() {
+        return object;
     }
+
+    //TODO: put wait on private object.
 
     /**
      * Calls {@link #wait()} on object in a thread safe manner.
-     * @see #setMessage(T)
+     * @see #set(T)
      */
-    synchronized public T awaitMessage() {
+    synchronized public T await() {
         try { this.wait(); }
         catch (InterruptedException ignored) { }
-        return message;
+        return object;
     }
 
     /**
@@ -40,9 +42,9 @@ public class MessageBuffer<T> {
      * @param timeOutDelay the time after witch the waiting times out.
      * @throws TimedOutException Gets thrown when waiting longer than the timeOutDelay.
      */
-    synchronized public T awaitMessage(int timeOutDelay) throws TimedOutException{
+    synchronized public T await(int timeOutDelay) throws TimedOutException{
         if (timeOutDelay <= 0) {
-            return awaitMessage();
+            return await();
         }
 
         this.notified = false;
@@ -51,7 +53,7 @@ public class MessageBuffer<T> {
         catch (InterruptedException ignored) { }
 
         if (!notified) throw new TimedOutException();
-        return message;
+        return object;
     }
 
     /**

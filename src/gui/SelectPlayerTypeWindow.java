@@ -1,10 +1,16 @@
 package gui;
 
+import games.Icon;
+import players.PlayerType;
+import threading.Buffer;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class PlayerOLocal extends JFrame implements ActionListener {
+class SelectPlayerTypeWindow extends JFrame implements ActionListener {
+
+    private final Buffer<PlayerType> playerTypeBuffer = new Buffer<>();
 
     JButton ai = new JButton();
     JButton human = new JButton();
@@ -12,15 +18,11 @@ public class PlayerOLocal extends JFrame implements ActionListener {
     JLabel label = new JLabel();
     JButton back = new JButton();
 
-
-    PlayerOLocal(){
+    SelectPlayerTypeWindow(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setSize(720, 720);
-        setVisible(true);
         setTitle("Game Launcher");
-        setLocationRelativeTo(null);
-
 
         ai.setText("AI");
         ai.addActionListener(this);
@@ -31,7 +33,6 @@ public class PlayerOLocal extends JFrame implements ActionListener {
         human.setBounds(400, 300, 100, 50);
 
         label.setBounds(250,200,200,100);
-        label.setText("Select Player Type for O");
 
         exit.setBounds(600, 20, 75, 75);
         exit.setText("Exit");
@@ -52,25 +53,38 @@ public class PlayerOLocal extends JFrame implements ActionListener {
         exit.addActionListener(this);
     }
 
+    public PlayerType getPlayerType() {
+        return getPlayerType(Icon.NO_ICON);
+    }
+
+    public PlayerType getPlayerType(Icon icon) {
+        if (icon == Icon.NO_ICON) label.setText("Select Player Type");
+        else label.setText("Select Player Type for " + icon.getChar());
+
+        setLocationRelativeTo(null);
+        setVisible(true);
+        return playerTypeBuffer.await();
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource()== ai){
-            dispose();
-            new SelectGame();
+            playerTypeBuffer.set(PlayerType.AI);
+            setVisible(false);
         }
 
         if (e.getSource()== human){
-            dispose();
-            new SelectGameOnline();
+            playerTypeBuffer.set(PlayerType.HUMAN);
+            setVisible(false);
         }
 
         if(e.getSource()==back){
-            dispose();
-            new GUI();
+            setVisible(false);
+            new SelectModeWindow();
         }
 
         if (e.getSource()==exit){
-            dispose();
+            setVisible(false);
         }
     }
 }

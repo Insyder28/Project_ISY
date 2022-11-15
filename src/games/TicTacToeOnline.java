@@ -1,6 +1,7 @@
 package games;
 
 import gui.GUI;
+import gui.TicTacToeGUI;
 import networking.GameSocket;
 import networking.ServerTimedOutException;
 import players.Player;
@@ -11,25 +12,24 @@ public class TicTacToeOnline implements OnlineGame {
     private final Board board = new Board(3, 3);
     private final GameSocket gameSocket;
     private final Player player;
-    private final GUI gui;
+    private TicTacToeGUI ticTacToeGUI;
 
     public TicTacToeOnline(Player player, GameSocket gameSocket) {
-        this.gui = GUI.getInstance();
         this.player = player;
         this.gameSocket = gameSocket;
     }
 
     @Override
     public void onMatch(Map<String, String> data) {
-        System.out.println("kinker");
+        ticTacToeGUI = GUI.getInstance().startTicTacToe();
 
         if (data.get("PLAYERTOMOVE").equals(gameSocket.getPlayerName()))
             player.setIcon(Icon.CROSS);
         else
             player.setIcon(Icon.NOUGHT);
 
-        gui.setCurrentPlayer(Icon.CROSS);
-        gui.updateBoard(board);
+        ticTacToeGUI.setCurrentPlayer(Icon.CROSS);
+        ticTacToeGUI.updateBoard(board);
     }
 
     @Override
@@ -44,25 +44,25 @@ public class TicTacToeOnline implements OnlineGame {
 
         board.set(Integer.parseInt(data.get("MOVE")), currentPlayer);
 
-        gui.updateBoard(board);
-        gui.setCurrentPlayer(currentPlayer.opponentIcon());
+        ticTacToeGUI.updateBoard(board);
+        ticTacToeGUI.setCurrentPlayer(currentPlayer.opponentIcon());
     }
 
     @Override
     public void onLoss(Map<String, String> data) {
-        gui.updateBoard(board);
-        gui.endGame("You lost");
+        ticTacToeGUI.updateBoard(board);
+        ticTacToeGUI.endGame("You lost");
     }
 
     @Override
     public void onWin(Map<String, String> data) {
-        gui.updateBoard(board);
-        gui.endGame("You won!");
+        ticTacToeGUI.updateBoard(board);
+        ticTacToeGUI.endGame("You won!");
     }
 
     @Override
     public void onDraw(Map<String, String> data) {
-        gui.updateBoard(board);
-        gui.endGame("It's a draw");
+        ticTacToeGUI.updateBoard(board);
+        ticTacToeGUI.endGame("It's a draw");
     }
 }
