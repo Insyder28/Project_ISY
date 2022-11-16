@@ -8,11 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 class SelectModeWindow extends JFrame implements ActionListener {
-    JButton local = new JButton();
-    JButton online = new JButton();
-
-    JLabel label = new JLabel();
-    JButton exit = new JButton();
+    private final JButton local = new JButton();
+    private final JButton online = new JButton();
 
     public SelectModeWindow(){
         local.setBounds(200, 300, 100, 50);
@@ -23,10 +20,7 @@ class SelectModeWindow extends JFrame implements ActionListener {
         online.addActionListener(this);
         online.setText("Online");
 
-        exit.setBounds(600, 20, 75, 75);
-        exit.setText("Exit");
-        exit.addActionListener(this);
-
+        JLabel label = new JLabel();
         label.setBounds(300,200,200,100);
         label.setText("How do you want to play?");
 
@@ -38,7 +32,6 @@ class SelectModeWindow extends JFrame implements ActionListener {
         add(local);
         add(online);
         add(label);
-        add(exit);
     }
 
     // methods
@@ -56,9 +49,6 @@ class SelectModeWindow extends JFrame implements ActionListener {
             gui.setSelectedMode(Mode.ONLINE);
             setVisible(false);
             gui.next();
-        }
-
-        else if (e.getSource()==exit){
         }
     }
 

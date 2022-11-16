@@ -9,11 +9,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 class SelectPlayerTypeWindow extends JFrame implements ActionListener {
-    JButton ai = new JButton();
-    JButton human = new JButton();
-    JButton exit = new JButton();
-    JLabel label = new JLabel();
-    JButton back = new JButton();
+    private final JButton ai = new JButton();
+    private final JButton human = new JButton();
+    private final JLabel label = new JLabel();
+    private final JButton back = new JButton();
 
     private Icon playerToSelect;
 
@@ -33,23 +32,14 @@ class SelectPlayerTypeWindow extends JFrame implements ActionListener {
 
         label.setBounds(250,200,200,100);
 
-        exit.setBounds(600, 20, 75, 75);
-        exit.setText("Exit");
-        exit.addActionListener(this);
-
         add(back);
         add(human);
         add(ai);
         add(label);
-        add(exit);
 
         back.setBounds(20, 20, 75, 75);
         back.setText("Return");
         back.addActionListener(this);
-
-        exit.setBounds(600, 20, 75, 75);
-        exit.setText("Exit");
-        exit.addActionListener(this);
     }
 
     public void mainFrame() {
@@ -84,9 +74,6 @@ class SelectPlayerTypeWindow extends JFrame implements ActionListener {
         else if(e.getSource()==back){
             setVisible(false);
             gui.previous();
-        }
-
-        else if (e.getSource()==exit){
         }
     }
 

@@ -11,8 +11,6 @@ class SelectGameWindow extends JFrame implements ActionListener {
     private final JButton ttt = new JButton();
     private final JButton Othello = new JButton();
     private final JButton back = new JButton();
-    private final JButton exit = new JButton();
-
 
     SelectGameWindow(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -36,15 +34,10 @@ class SelectGameWindow extends JFrame implements ActionListener {
         add(Othello);
         add(ttt);
         add(label);
-        add(exit);
 
         back.setBounds(20, 20, 75, 75);
         back.setText("Return");
         back.addActionListener(this);
-
-        exit.setBounds(600, 20, 75, 75);
-        exit.setText("Exit");
-        exit.addActionListener(this);
     }
 
     @Override
@@ -66,9 +59,6 @@ class SelectGameWindow extends JFrame implements ActionListener {
         else if(e.getSource()==back){
             setVisible(false);
             gui.previous();
-        }
-
-        else if (e.getSource()==exit){
         }
     }
 

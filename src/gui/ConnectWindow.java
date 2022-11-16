@@ -5,12 +5,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ConnectWindow extends JFrame implements ActionListener {
-    JButton connect = new JButton();
-    JButton exit = new JButton();
-    JLabel label = new JLabel();
-    JButton back = new JButton();
+    private final JButton connect = new JButton();
+    private final JButton back = new JButton();
 
-    JTextField serverIP = new JTextField();
+    private final JTextField serverIP = new JTextField();
 
     public ConnectWindow() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -24,12 +22,9 @@ public class ConnectWindow extends JFrame implements ActionListener {
         connect.addActionListener(this);
         connect.setBounds(200, 300, 100, 50);
 
+        JLabel label = new JLabel();
         label.setBounds(250,200,200,100);
         label.setText("Enter IP address");
-
-        exit.setBounds(600, 20, 75, 75);
-        exit.setText("Exit");
-        exit.addActionListener(this);
 
         serverIP.setLayout(null);
         serverIP.setBounds(250, 500, 200, 50);
@@ -45,16 +40,11 @@ public class ConnectWindow extends JFrame implements ActionListener {
         add(back);
         add(connect);
         add(label);
-        add(exit);
         add(serverIP);
 
         back.setBounds(20, 20, 75, 75);
         back.setText("Return");
         back.addActionListener(this);
-
-        exit.setBounds(600, 20, 75, 75);
-        exit.setText("Exit");
-        exit.addActionListener(this);
     }
 
     @Override
@@ -68,10 +58,6 @@ public class ConnectWindow extends JFrame implements ActionListener {
         }
 
         else if(e.getSource() == back){
-            setVisible(false);
-        }
-
-        else if (e.getSource() == exit){
             setVisible(false);
         }
     }
