@@ -1,13 +1,12 @@
 package games;
 
-import gui.GUI;
 import gui.TicTacToeGUI;
+import main.GameController;
 import players.Player;
 
 public class TicTacToe {
     private final Board board;
     private boolean gameRunning = false;
-    private TicTacToeGUI ticTacToeGUI;
 
     public TicTacToe () {
         board = new Board(3, 3);
@@ -18,7 +17,7 @@ public class TicTacToe {
         if (gameRunning) throw new RuntimeException("Game already running"); //TODO: create custom exception.
         gameRunning = true;
 
-        ticTacToeGUI = GUI.getInstance().startTicTacToe();
+        TicTacToeGUI ticTacToeGUI = GameController.getInstance().getGUI().startTicTacToe();
 
         // Setup
         board.clear();

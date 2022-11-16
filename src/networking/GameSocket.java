@@ -1,6 +1,6 @@
 package networking;
 
-import threading.Buffer;
+import util.Buffer;
 import events.Event;
 
 import java.io.Closeable;

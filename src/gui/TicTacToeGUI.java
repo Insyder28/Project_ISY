@@ -2,7 +2,8 @@ package gui;
 
 import games.Board;
 import games.Icon;
-import threading.Buffer;
+import main.GameController;
+import util.Buffer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -61,7 +62,7 @@ public class TicTacToeGUI extends JFrame implements ActionListener {
         Object ignored = optionPane.getValue();   // Wait till user presses ok or closes pop-up
         dialog.dispose();
 
-        GUI.getInstance().dispose();
+        GameController.getInstance().getGUI().dispose();
         dispose();
     }
 
@@ -93,19 +94,8 @@ public class TicTacToeGUI extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         for (int i = 0; i < 9; i++) {
             if (e.getSource() == grid[i]) {
-//                if (grid[i].getText() == "") {
-//                    grid[i].setForeground(new Color(255, 0, 0));
-//                    grid[i].setText("X");
                 buttonPressed.set(i);
-
             }
-//            else {
-//                if (e.getSource() == grid[i]) {
-//                    if (grid[i].getText() == "") {
-//                        grid[i].setForeground(new Color(0, 0, 255));
-//                        grid[i].setText("O");
-//                }
-//            }
         }
     }
 }

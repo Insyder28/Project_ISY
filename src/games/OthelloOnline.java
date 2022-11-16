@@ -1,6 +1,7 @@
 package games;
 
 import gui.GUI;
+import main.GameController;
 import networking.GameSocket;
 import players.Player;
 
@@ -8,11 +9,10 @@ import java.util.Map;
 
 public class OthelloOnline implements OnlineGame {
     private final GameSocket gameSocket;
-    private final GUI gui;
+    private final GUI gui = GameController.getInstance().getGUI();
     private final Player player;
 
     public OthelloOnline(Player player, GameSocket gameSocket) {
-        this.gui = GUI.getInstance();
         this.player = player;
         this.gameSocket = gameSocket;
     }

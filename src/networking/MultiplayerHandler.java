@@ -4,7 +4,7 @@ import events.EventListener;
 import games.OnlineGame;
 import games.TicTacToeOnline;
 import players.*;
-import threading.Trigger;
+import util.Trigger;
 
 import java.io.Closeable;
 import java.util.HashMap;

@@ -1,16 +1,13 @@
 package gui;
 
-import games.Icon;
 import games.Mode;
-import threading.Buffer;
+import main.GameController;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 class SelectModeWindow extends JFrame implements ActionListener {
-    private final Buffer<Mode> modeBuffer = new Buffer<>();
-
     JButton local = new JButton();
     JButton online = new JButton();
 
@@ -47,24 +44,26 @@ class SelectModeWindow extends JFrame implements ActionListener {
     // methods
     @Override
     public void actionPerformed(ActionEvent e) {
+        GUI gui = GameController.getInstance().getGUI();
+
         if(e.getSource()==local){
-            modeBuffer.set(Mode.LOCAL);
+            gui.setSelectedMode(Mode.LOCAL);
             setVisible(false);
+            gui.next();
         }
 
-        if(e.getSource()== online){
-            modeBuffer.set(Mode.ONLINE);
+        else if(e.getSource()== online){
+            gui.setSelectedMode(Mode.ONLINE);
             setVisible(false);
+            gui.next();
         }
 
-        if (e.getSource()==exit){
-            setVisible(false);
+        else if (e.getSource()==exit){
         }
     }
 
-    public Mode getMode() {
+    public void mainFrame() {
         setLocationRelativeTo(null);
         setVisible(true);
-        return modeBuffer.await();
     }
 }

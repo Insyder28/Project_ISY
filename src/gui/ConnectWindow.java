@@ -1,7 +1,5 @@
 package gui;
 
-import threading.Buffer;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,13 +12,10 @@ public class ConnectWindow extends JFrame implements ActionListener {
 
     JTextField serverIP = new JTextField();
 
-    Buffer<String> ipBuffer = new Buffer<>();
-
     public ConnectWindow() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setSize(720, 720);
-        setVisible(true);
         setTitle("Game Launcher");
         setLocationRelativeTo(null);
 
@@ -68,7 +63,6 @@ public class ConnectWindow extends JFrame implements ActionListener {
             String ip = serverIP.getText();
             if (invalidIp(ip)) JOptionPane.showMessageDialog(this, "Please enter a valid IP address.", "Invalid IP address", JOptionPane.ERROR_MESSAGE);
             else {
-                ipBuffer.set(ip);
                 setVisible(false);
             }
         }
@@ -81,13 +75,6 @@ public class ConnectWindow extends JFrame implements ActionListener {
             setVisible(false);
         }
     }
-
-    public String getIp() {
-        setLocationRelativeTo(null);
-        setVisible(true);
-        return ipBuffer.await();
-    }
-
 
     private boolean invalidIp(String ip) {
         try {

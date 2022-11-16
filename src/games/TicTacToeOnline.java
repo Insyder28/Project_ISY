@@ -1,7 +1,7 @@
 package games;
 
-import gui.GUI;
 import gui.TicTacToeGUI;
+import main.GameController;
 import networking.GameSocket;
 import networking.ServerTimedOutException;
 import players.Player;
@@ -21,7 +21,7 @@ public class TicTacToeOnline implements OnlineGame {
 
     @Override
     public void onMatch(Map<String, String> data) {
-        ticTacToeGUI = GUI.getInstance().startTicTacToe();
+        ticTacToeGUI = GameController.getInstance().getGUI().startTicTacToe();
 
         if (data.get("PLAYERTOMOVE").equals(gameSocket.getPlayerName()))
             player.setIcon(Icon.CROSS);

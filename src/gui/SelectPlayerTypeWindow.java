@@ -1,22 +1,21 @@
 package gui;
 
 import games.Icon;
+import main.GameController;
 import players.PlayerType;
-import threading.Buffer;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 class SelectPlayerTypeWindow extends JFrame implements ActionListener {
-
-    private final Buffer<PlayerType> playerTypeBuffer = new Buffer<>();
-
     JButton ai = new JButton();
     JButton human = new JButton();
     JButton exit = new JButton();
     JLabel label = new JLabel();
     JButton back = new JButton();
+
+    private Icon playerToSelect;
 
     SelectPlayerTypeWindow(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -53,38 +52,46 @@ class SelectPlayerTypeWindow extends JFrame implements ActionListener {
         exit.addActionListener(this);
     }
 
-    public PlayerType getPlayerType() {
-        return getPlayerType(Icon.NO_ICON);
+    public void mainFrame() {
+        mainFrame(Icon.NO_ICON);
     }
 
-    public PlayerType getPlayerType(Icon icon) {
-        if (icon == Icon.NO_ICON) label.setText("Select Player Type");
-        else label.setText("Select Player Type for " + icon.getChar());
+    public void mainFrame(Icon playerToSelect) {
+        this.playerToSelect = playerToSelect;
 
-        setLocationRelativeTo(null);
-        setVisible(true);
-        return playerTypeBuffer.await();
+        if (playerToSelect == Icon.NO_ICON) label.setText("Select Player Type");
+        else label.setText("Select Player Type for " + playerToSelect.getChar());
+
+        showWindow();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        GUI gui = GameController.getInstance().getGUI();
+
         if (e.getSource()== ai){
-            playerTypeBuffer.set(PlayerType.AI);
+            gui.setSelectedPlayerType(PlayerType.AI, playerToSelect);
             setVisible(false);
+            gui.next();
         }
 
-        if (e.getSource()== human){
-            playerTypeBuffer.set(PlayerType.HUMAN);
+        else if (e.getSource()== human){
+            gui.setSelectedPlayerType(PlayerType.HUMAN, playerToSelect);
             setVisible(false);
+            gui.next();
         }
 
-        if(e.getSource()==back){
+        else if(e.getSource()==back){
             setVisible(false);
-            new SelectModeWindow();
+            gui.previous();
         }
 
-        if (e.getSource()==exit){
-            setVisible(false);
+        else if (e.getSource()==exit){
         }
+    }
+
+    private void showWindow() {
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 }

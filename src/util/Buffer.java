@@ -1,4 +1,4 @@
-package threading;
+package util;
 
 /**
  * A thread save buffer.

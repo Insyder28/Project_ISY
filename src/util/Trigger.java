@@ -1,4 +1,4 @@
-package threading;
+package util;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

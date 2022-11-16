@@ -1,20 +1,18 @@
 package gui;
 
 import games.GameType;
-import threading.Buffer;
+import main.GameController;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 class SelectGameWindow extends JFrame implements ActionListener {
-    private Buffer<GameType> gameTypeBuffer = new Buffer<>();
+    private final JButton ttt = new JButton();
+    private final JButton Othello = new JButton();
+    private final JButton back = new JButton();
+    private final JButton exit = new JButton();
 
-    JButton ttt = new JButton();
-    JButton Othello = new JButton();
-    JLabel label = new JLabel();
-    JButton back = new JButton();
-    JButton exit = new JButton();
 
     SelectGameWindow(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -30,6 +28,7 @@ class SelectGameWindow extends JFrame implements ActionListener {
         Othello.addActionListener(this);
         Othello.setBounds(400, 300, 100, 50);
 
+        JLabel label = new JLabel();
         label.setBounds(250,200,200,100);
         label.setText("What game do you want to play?");
 
@@ -50,28 +49,35 @@ class SelectGameWindow extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        GUI gui = GameController.getInstance().getGUI();
+
         if (e.getSource()== ttt){
-            gameTypeBuffer.set(GameType.TICTACTOE);
+            gui.setSelectedGameType(GameType.TICTACTOE);
             setVisible(false);
+            gui.next();
         }
 
-        if (e.getSource()== Othello){
-            gameTypeBuffer.set(GameType.OTHELLO);
+        else if (e.getSource()== Othello){
+            gui.setSelectedGameType(GameType.OTHELLO);
             setVisible(false);
+            gui.next();
         }
 
-        if(e.getSource()==back){
+        else if(e.getSource()==back){
             setVisible(false);
+            gui.previous();
         }
 
-        if (e.getSource()==exit){
-            setVisible(false);
+        else if (e.getSource()==exit){
         }
     }
 
-    public GameType getGameType() {
+    public void mainFrame() {
+        showWindow();
+    }
+
+    private void showWindow() {
         setLocationRelativeTo(null);
         setVisible(true);
-        return gameTypeBuffer.await();
     }
 }

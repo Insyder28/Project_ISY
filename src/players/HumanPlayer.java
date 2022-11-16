@@ -3,7 +3,7 @@ package players;
 import games.Board;
 import games.Icon;
 import gui.GUI;
-import gui.TicTacToeGUI;
+import main.GameController;
 
 /**
  * A player that lets a human decide its moves.
@@ -11,7 +11,7 @@ import gui.TicTacToeGUI;
  */
 public class HumanPlayer implements Player {
     private Icon icon = Icon.NO_ICON;
-    private final GUI gui = GUI.getInstance();
+    private final GUI gui = GameController.getInstance().getGUI();
 
     /**
      * Setter for player icon.
