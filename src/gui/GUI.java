@@ -5,6 +5,8 @@ import games.Icon;
 import games.Mode;
 import players.PlayerType;
 
+import javax.swing.*;
+
 public class GUI {
     // Singleton logic
     private static GUI instance = null;
@@ -17,6 +19,8 @@ public class GUI {
     private final SelectPlayerTypeWindow selectPlayerTypeWindow = new SelectPlayerTypeWindow();
     private final SelectModeWindow selectModeWindow = new SelectModeWindow();
     private final SelectGameWindow selectGameWindow = new SelectGameWindow();
+    private final ConnectWindow connectWindow = new ConnectWindow();
+    private final LoadingWindow loadingWindow = new LoadingWindow();
 
     private TicTacToeGUI ticTacToeGUI = null;
 
@@ -47,6 +51,22 @@ public class GUI {
 
     public GameType selectGameType() {
         return selectGameWindow.getGameType();
+    }
+
+    public String getIp() {
+        return connectWindow.getIp();
+    }
+
+    public void startLoading(String message) {
+        loadingWindow.startLoading(message);
+    }
+
+    public void stopLoading() {
+        loadingWindow.stopLoading();
+    }
+
+    public void showMessage(String message, String title,  int messageType) {
+        JOptionPane.showMessageDialog(null, message, title, messageType);
     }
 
     public TicTacToeGUI startTicTacToe() {

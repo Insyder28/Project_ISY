@@ -1,10 +1,16 @@
+import games.GameType;
 import games.Icon;
 import games.TicTacToe;
 import gui.GUI;
+import networking.GameSocket;
+import networking.MultiplayerHandler;
 import players.AIPlayer;
 import players.HumanPlayer;
 import players.Player;
 import players.PlayerType;
+
+import javax.swing.*;
+import java.io.IOException;
 
 public class Main {
     private static final GUI gui = new GUI();
@@ -36,6 +42,25 @@ public class Main {
 
     // Online
     private static void selectedOnline() {
+        PlayerType playerType = gui.selectPlayerType();
+        String address = gui.getIp();
 
+        gui.startLoading("Connecting to server...");
+        int port = 7789;
+        if (address.contains(":")) {
+            String[] addressAndPort = address.split(":");
+            port = Integer.parseInt(addressAndPort[1]);
+            address = addressAndPort[2];
+        }
+
+        GameSocket gameSocket;
+
+        try {
+            gameSocket = new GameSocket(address, port);
+        }
+        catch (IOException e) {
+            gui.stopLoading();
+            gui.showMessage(e.getMessage(), "Failed to connect", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
