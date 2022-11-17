@@ -46,7 +46,14 @@ public class TicTacToe {
                 System.out.println("\n" + player.getIcon() + "'s turn\n" + board);
                 ticTacToeGUI.updateBoard(board);
                 ticTacToeGUI.setCurrentPlayer(player.getIcon());
-                int pos = player.move(board);
+
+                int pos;
+                try {
+                    pos = player.move(board);
+                }
+                catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
 
                 // Validate
                 if (!validateMove(pos)) {

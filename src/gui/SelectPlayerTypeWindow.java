@@ -52,7 +52,8 @@ class SelectPlayerTypeWindow extends JFrame implements ActionListener {
         if (playerToSelect == Icon.NO_ICON) label.setText("Select Player Type");
         else label.setText("Select Player Type for " + playerToSelect.getChar());
 
-        showWindow();
+        setLocation(GameController.getInstance().getGUI().getLastLocation());
+        setVisible(true);
     }
 
     @Override
@@ -62,23 +63,21 @@ class SelectPlayerTypeWindow extends JFrame implements ActionListener {
         if (e.getSource()== ai){
             gui.setSelectedPlayerType(PlayerType.AI, playerToSelect);
             setVisible(false);
-            gui.next();
+            gui.setLastLocation(getLocation());
+            gui.nextWindow();
         }
 
         else if (e.getSource()== human){
             gui.setSelectedPlayerType(PlayerType.HUMAN, playerToSelect);
             setVisible(false);
-            gui.next();
+            gui.setLastLocation(getLocation());
+            gui.nextWindow();
         }
 
         else if(e.getSource()==back){
             setVisible(false);
-            gui.previous();
+            gui.setLastLocation(getLocation());
+            gui.previousWindow();
         }
-    }
-
-    private void showWindow() {
-        setLocationRelativeTo(null);
-        setVisible(true);
     }
 }

@@ -1,11 +1,14 @@
 package util;
 
+//TODO: put wait on private object
+
 /**
  * A thread save buffer.
  */
 public class Buffer<T> {
     T object;
-    private volatile boolean notified = false;
+    private volatile boolean isSet = false;
+    private volatile boolean interrupted = false;
 
     /**
      * Set a message and call {@link #notify()} on object in a thread safe manner.
@@ -13,7 +16,7 @@ public class Buffer<T> {
      */
     synchronized public void set(T object) {
         this.object = object;
-        this.notified = true;
+        this.isSet = true;
         this.notify();
     }
 
@@ -31,9 +34,12 @@ public class Buffer<T> {
      * Calls {@link #wait()} on object in a thread safe manner.
      * @see #set(T)
      */
-    synchronized public T await() {
+    synchronized public T await() throws InterruptedException {
         try { this.wait(); }
         catch (InterruptedException ignored) { }
+
+        if (interrupted) throw new InterruptedException("Interrupted await");
+
         return object;
     }
 
@@ -42,18 +48,27 @@ public class Buffer<T> {
      * @param timeOutDelay the time after witch the waiting times out.
      * @throws TimedOutException Gets thrown when waiting longer than the timeOutDelay.
      */
-    synchronized public T await(int timeOutDelay) throws TimedOutException{
+    synchronized public T await(int timeOutDelay) throws TimedOutException, InterruptedException {
         if (timeOutDelay <= 0) {
             return await();
         }
 
-        this.notified = false;
+        this.isSet = false;
 
         try { this.wait(timeOutDelay); }
         catch (InterruptedException ignored) { }
 
-        if (!notified) throw new TimedOutException();
+        if (!isSet) throw new TimedOutException();
+        if (interrupted) throw new InterruptedException("Interrupted await");
         return object;
+    }
+
+    /**
+     * Interrupts await.
+     */
+    synchronized public void interrupt() {
+        this.interrupted = true;
+        this.notify();
     }
 
     /**

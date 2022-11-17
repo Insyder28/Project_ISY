@@ -12,33 +12,51 @@ import java.awt.event.ActionListener;
 
 public class TicTacToeGUI extends JFrame implements ActionListener {
     public JPanel grid_panel = new JPanel();
+
     public JPanel title_panel = new JPanel();
-    public JLabel textField = new JLabel();
+    public JLabel currentPlayer = new JLabel();
+    public JLabel player = new JLabel();
+
+    GridLayout titleLayout = new GridLayout(1, 2);
+
     public JButton[] grid = new JButton[9];
+
 
     public Buffer<Integer> buttonPressed = new Buffer<>();
 
-    public TicTacToeGUI() {
+    public TicTacToeGUI(boolean showPlayer) {
         setTitle("TicTacToe");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(720, 720);
-        setLocationRelativeTo(null);
+
+        setLocation(GameController.getInstance().getGUI().getLastLocation());
+
         setLayout(new BorderLayout());
 
         grid_panel.setLayout(new GridLayout(3, 3));
         grid_panel.setBackground(new Color(150, 150, 150));
 
-        textField.setBackground(new Color(25, 25, 25));
-        textField.setForeground(new Color(25, 255, 0));
-        textField.setFont(new Font("Monospace", Font.BOLD, 75));
-        textField.setHorizontalAlignment(JLabel.CENTER);
-        textField.setText("Tic-Tac-Toe");
-        textField.setOpaque(true);
+        currentPlayer.setBackground(new Color(25, 25, 25));
+        currentPlayer.setForeground(new Color(25, 255, 0));
+        currentPlayer.setFont(new Font("Monospace", Font.BOLD, 50));
+        currentPlayer.setHorizontalAlignment(JLabel.CENTER);
+        currentPlayer.setOpaque(true);
 
         title_panel.setLayout(new BorderLayout());
         title_panel.setBounds(0, 0, 720, 80);
 
-        title_panel.add(textField);
+        title_panel.add(currentPlayer);
+
+        if (showPlayer) {
+            player.setBackground(new Color(25, 25, 25));
+            player.setForeground(new Color(25, 255, 0));
+            player.setFont(new Font("Monospace", Font.BOLD, 50));
+            player.setHorizontalAlignment(JLabel.CENTER);
+            player.setOpaque(true);
+
+            title_panel.setLayout(titleLayout);
+            title_panel.add(player);
+        }
 
         for (int i = 0; i < 9; i++) {
             grid[i] = new JButton();
@@ -55,22 +73,23 @@ public class TicTacToeGUI extends JFrame implements ActionListener {
     }
 
     public void endGame(String message) {
-        JOptionPane optionPane = new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE);
-        JDialog dialog = optionPane.createDialog("End of game");
-        dialog.setVisible(true);
+        buttonPressed.interrupt();
+        title_panel.remove(player);
+        title_panel.setLayout(new GridLayout());
+        currentPlayer.setText(message);
 
-        Object ignored = optionPane.getValue();   // Wait till user presses ok or closes pop-up
-        dialog.dispose();
-
-        GameController.getInstance().getGUI().dispose();
-        dispose();
+        GameController.getInstance().getGUI().gameEnded();
     }
 
     public void setCurrentPlayer(Icon icon) {
-        textField.setText(icon.getChar() + " turn");
+        currentPlayer.setText(icon.getChar() + " turn");
     }
 
-    public int getMove() {
+    public void setPlayer(Icon icon) {
+        player.setText("You are: " + icon.getChar());
+    }
+
+    public int getMove() throws InterruptedException {
         return buttonPressed.await();
     }
 

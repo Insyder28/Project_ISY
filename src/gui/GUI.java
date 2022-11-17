@@ -1,20 +1,23 @@
 package gui;
 
-import events.EventListener;
 import games.GameType;
 import games.Mode;
 import games.Icon;
 import players.PlayerType;
-import util.InstanceNotFoundException;
 
-import javax.swing.*;
+import java.awt.*;
 
 public class GUI {
     // Instance fields
+    private Point lastLocation = null;
+
     private final SelectModeWindow selectModeWindow = new SelectModeWindow();
     private final SelectGameWindow selectGameWindow = new SelectGameWindow();
     private final SelectPlayerTypeWindow selectPlayerTypeWindow = new SelectPlayerTypeWindow();
     private final ConnectWindow connectWindow = new ConnectWindow();
+    private final LoginWindow loginWindow = new LoginWindow();
+    private final MultiplayerWindow multiplayerWindow = new MultiplayerWindow();
+
     private final LoadingWindow loadingWindow = new LoadingWindow();
 
     private Mode selectedMode = null;
@@ -22,25 +25,22 @@ public class GUI {
     private PlayerType selectedPlayerType = null;
     private PlayerType selectedXPlayerType = null;
     private PlayerType selectedOPlayerType = null;
+    private boolean isConnected = false;
+    private boolean isLoggedIn = false;
 
     private TicTacToeGUI ticTacToeGUI = null;
 
-    private EventListener onStartLocalGame;
+    final GUIEventListener guiEventListener;
 
     // Constructor
-    public GUI(EventListener onStartLocalGame) {
-        this.onStartLocalGame = onStartLocalGame;
-        next();
+    public GUI(GUIEventListener guiEventListener) {
+        this.guiEventListener = guiEventListener;
+        nextWindow();
     }
 
     // Getters and Setters
     public TicTacToeGUI getTicTacToeGUI() {
-        if (ticTacToeGUI == null) throw new InstanceNotFoundException("There is currently no instance of TicTacToeGUI");
         return ticTacToeGUI;
-    }
-
-    public Mode getSelectedMode() {
-        return this.selectedMode;
     }
 
     public GameType getSelectedGameType() {
@@ -59,6 +59,10 @@ public class GUI {
         }
     }
 
+    public Point getLastLocation() {
+        return lastLocation;
+    }
+
     void setSelectedMode(Mode selectedMode) {
         this.selectedMode = selectedMode;
     }
@@ -75,33 +79,36 @@ public class GUI {
         }
     }
 
-    // Public Methods
-    public void startLoading(String message) {
-        loadingWindow.startLoading(message);
+    void connected() {
+        this.isConnected = true;
     }
+
+    void loggedIn() {
+        this.isLoggedIn = true;
+    }
+
+    public void setLastLocation(Point lastLocation) {
+        this.lastLocation = lastLocation;
+    }
+
+    // Public Methods
 
     public void stopLoading() {
         loadingWindow.stopLoading();
     }
 
-    public void showMessage(String message, String title,  int messageType) {
-        JOptionPane.showMessageDialog(null, message, title, messageType);
-    }
-
     public TicTacToeGUI startTicTacToe() {
-        TicTacToeGUI gui = new TicTacToeGUI();
-        this.ticTacToeGUI = gui;
-        return gui;
+        return startTicTacToe(false);
     }
 
-    public void dispose() {
-        selectPlayerTypeWindow.dispose();
-        selectGameWindow.dispose();
-        selectModeWindow.dispose();
+    public TicTacToeGUI startTicTacToe(boolean showPlayer) {
+        if (this.ticTacToeGUI != null) this.ticTacToeGUI.dispose();
+        this.ticTacToeGUI = new TicTacToeGUI(showPlayer);
+        return this.ticTacToeGUI;
     }
 
     // Package private Methods
-    void next() {
+    void nextWindow() {
         new Thread(() -> {
             if (selectedMode == null) {
                 selectModeWindow.mainFrame();
@@ -113,17 +120,20 @@ public class GUI {
                     if (selectedGameType == null) selectGameWindow.mainFrame();
                     else if (selectedXPlayerType == null) selectPlayerTypeWindow.mainFrame(Icon.CROSS);
                     else if (selectedOPlayerType == null) selectPlayerTypeWindow.mainFrame(Icon.NOUGHT);
-                    else onStartLocalGame.onEvent(null);
+                    else guiEventListener.onStartLocalGame();
                 }
 
                 case ONLINE -> {
                     if (selectedPlayerType == null) selectPlayerTypeWindow.mainFrame();
+                    else if (!isConnected) connectWindow.mainFrame();
+                    else if (!isLoggedIn) loginWindow.mainFrame();
+                    else multiplayerWindow.mainFrame();
                 }
             }
         }).start();
     }
 
-    void previous() {
+    void previousWindow() {
         if (selectedMode == null) return;
 
         switch (selectedMode) {
@@ -141,7 +151,36 @@ public class GUI {
                     selectPlayerTypeWindow.mainFrame(Icon.CROSS);
                 }
             }
-            case ONLINE -> {}
+            case ONLINE -> {
+                if (selectedPlayerType == null) {
+                    selectedMode = null;
+                    selectModeWindow.mainFrame();
+                }
+                else if (!isConnected) {
+                    selectedPlayerType = null;
+                    selectPlayerTypeWindow.mainFrame();
+                }
+            }
+        }
+    }
+
+    void disconnect() {
+        guiEventListener.onDisconnect();
+        isConnected = false;
+        isLoggedIn = false;
+        selectedPlayerType = null;
+        selectModeWindow.mainFrame();
+    }
+
+    void gameEnded() {
+        if (selectedMode == Mode.LOCAL){
+            selectedMode = null;
+            selectedGameType = null;
+            selectedPlayerType = null;
+            selectedXPlayerType = null;
+            selectedOPlayerType = null;
+            isConnected = false;
+            isLoggedIn = false;
         }
     }
 }

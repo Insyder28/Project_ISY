@@ -1,5 +1,7 @@
 package gui;
 
+import main.GameController;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,7 +18,6 @@ public class ConnectWindow extends JFrame implements ActionListener {
         setSize(720, 720);
         setTitle("Game Launcher");
         setLocationRelativeTo(null);
-
 
         connect.setText("Connect");
         connect.addActionListener(this);
@@ -47,18 +48,39 @@ public class ConnectWindow extends JFrame implements ActionListener {
         back.addActionListener(this);
     }
 
+    public void mainFrame() {
+        setLocation(GameController.getInstance().getGUI().getLastLocation());
+        setVisible(true);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
+        GUI gui = GameController.getInstance().getGUI();
+
         if (e.getSource() == connect){
             String ip = serverIP.getText();
-            if (invalidIp(ip)) JOptionPane.showMessageDialog(this, "Please enter a valid IP address.", "Invalid IP address", JOptionPane.ERROR_MESSAGE);
+            if (invalidIp(ip)) {
+                JOptionPane.showMessageDialog(this, "Please enter a valid IP address.", "Invalid IP address", JOptionPane.ERROR_MESSAGE);
+            }
             else {
-                setVisible(false);
+                try {
+                    gui.guiEventListener.onConnect(ip);
+
+                    setVisible(false);
+                    gui.setLastLocation(getLocation());
+                    gui.connected();
+                    gui.nextWindow();
+                }
+                catch (ActionFailedException exc) {
+                    JOptionPane.showMessageDialog(this, exc.getMessage(), "Failed to connect", JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
 
         else if(e.getSource() == back){
             setVisible(false);
+            gui.setLastLocation(getLocation());
+            gui.previousWindow();
         }
     }
 

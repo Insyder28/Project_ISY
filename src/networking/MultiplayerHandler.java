@@ -10,16 +10,18 @@ import java.io.Closeable;
 import java.util.HashMap;
 import java.util.Map;
 
+//TODO: fix player sometimes not putting move on the board
 public class MultiplayerHandler implements Closeable {
     private final GameSocket gameSocket;
 
-    private PlayerType playerType;
-    private String playerName;
+    private final PlayerType playerType;
 
     private OnlineGame currentGame;
 
-    final Trigger foundMatch = new Trigger(false);
-    final Trigger receivedOpponentMove = new Trigger(false);
+    private final Trigger foundMatch = new Trigger(false);
+    private final Trigger receivedOpponentMove = new Trigger(false);
+    private final Trigger canStartMatch = new Trigger(true);
+    private final Trigger canEndMatch = new Trigger(true);
 
     // Create EventListener objects, so they can be removed from the events later
     private final EventListener onMatch = this::onMatch;
@@ -59,6 +61,9 @@ public class MultiplayerHandler implements Closeable {
     }
 
     private void onMatch(String args) {
+        canStartMatch.await();
+        canStartMatch.set(false);
+
         Map<String, String> data = toMap(args);   // Create map from server data
 
         switch (data.get("GAMETYPE")) {
@@ -68,12 +73,12 @@ public class MultiplayerHandler implements Closeable {
 
         currentGame.onMatch(data);
 
-        // Set foundMatch to true
-        foundMatch.set(true);
-
         // Set receivedOpponentMove to true when we have to do first move
         if (data.get("PLAYERTOMOVE").equals(gameSocket.getPlayerName()))
             receivedOpponentMove.set(true);
+
+        // Set foundMatch to true
+        foundMatch.set(true);
     }
 
     private void onYourTurn(String args) {
@@ -95,30 +100,42 @@ public class MultiplayerHandler implements Closeable {
     }
 
     private void onMove(String args) {
+        canEndMatch.set(false);
+        foundMatch.await();
+
         Map<String, String> data = toMap(args);   // Create map from server data
 
         currentGame.onMove(data);
 
-        if (!data.get("PLAYER").equals(playerName))
+        if (!data.get("PLAYER").equals(gameSocket.getPlayerName()))
             receivedOpponentMove.set(true);
+
+        canEndMatch.set(true);
     }
 
     private void onLoss(String args) {
         Map<String, String> data = toMap(args);   // Create map from server data
-
         currentGame.onLoss(data);
+        endMatch();
     }
 
     private void onWin(String args) {
         Map<String, String> data = toMap(args);   // Create map from server data
-
         currentGame.onWin(data);
+        endMatch();
     }
 
     private void onDraw(String args) {
         Map<String, String> data = toMap(args);   // Create map from server data
-
         currentGame.onDraw(data);
+        endMatch();
+    }
+
+    private void endMatch() {
+        canEndMatch.await();
+        foundMatch.set(false);
+        receivedOpponentMove.set(false);
+        canStartMatch.set(true);
     }
 
 
@@ -138,8 +155,9 @@ public class MultiplayerHandler implements Closeable {
 
     }
 
-    private void onServerTimeout(Throwable e) {
+    private void onServerTimeout(Throwable ignored) {
         gameSocket.close();
+        close();
     }
 
     private Map<String, String> toMap(String s) {

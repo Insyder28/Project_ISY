@@ -1,18 +1,17 @@
 package gui;
 
-import games.GameType;
 import main.GameController;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-class SelectGameWindow extends JFrame implements ActionListener {
+class MultiplayerWindow extends JFrame implements ActionListener {
     private final JButton ttt = new JButton();
     private final JButton Othello = new JButton();
-    private final JButton back = new JButton();
+    private final JButton disconnect = new JButton();
 
-    SelectGameWindow(){
+    MultiplayerWindow(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setSize(720, 720);
@@ -28,16 +27,16 @@ class SelectGameWindow extends JFrame implements ActionListener {
 
         JLabel label = new JLabel();
         label.setBounds(250,200,200,100);
-        label.setText("What game do you want to play?");
+        label.setText("Subscribe to game");
 
-        add(back);
+        add(disconnect);
         add(Othello);
         add(ttt);
         add(label);
 
-        back.setBounds(20, 20, 75, 75);
-        back.setText("Return");
-        back.addActionListener(this);
+        disconnect.setBounds(20, 20, 75, 75);
+        disconnect.setText("Disconnect");
+        disconnect.addActionListener(this);
     }
 
     @Override
@@ -45,23 +44,23 @@ class SelectGameWindow extends JFrame implements ActionListener {
         GUI gui = GameController.getInstance().getGUI();
 
         if (e.getSource()== ttt){
-            gui.setSelectedGameType(GameType.TICTACTOE);
-            setVisible(false);
+            GameController.getInstance().getMultiplayerHandler().subscribe("tic-tac-toe");
             gui.setLastLocation(getLocation());
+            setVisible(false);
             gui.nextWindow();
         }
 
         else if (e.getSource()== Othello){
-            gui.setSelectedGameType(GameType.OTHELLO);
-            setVisible(false);
+            GameController.getInstance().getMultiplayerHandler().subscribe("othello");
             gui.setLastLocation(getLocation());
+            setVisible(false);
             gui.nextWindow();
         }
 
-        else if(e.getSource()==back){
-            setVisible(false);
+        else if (e.getSource()== disconnect){
             gui.setLastLocation(getLocation());
-            gui.previousWindow();
+            setVisible(false);
+            gui.disconnect();
         }
     }
 

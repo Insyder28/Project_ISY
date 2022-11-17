@@ -21,20 +21,25 @@ public class TicTacToeOnline implements OnlineGame {
 
     @Override
     public void onMatch(Map<String, String> data) {
-        ticTacToeGUI = GameController.getInstance().getGUI().startTicTacToe();
+        ticTacToeGUI = GameController.getInstance().getGUI().startTicTacToe(true);
 
         if (data.get("PLAYERTOMOVE").equals(gameSocket.getPlayerName()))
             player.setIcon(Icon.CROSS);
         else
             player.setIcon(Icon.NOUGHT);
 
+        ticTacToeGUI.setPlayer(player.getIcon());
         ticTacToeGUI.setCurrentPlayer(Icon.CROSS);
         ticTacToeGUI.updateBoard(board);
     }
 
     @Override
     public void onYourTurn(Map<String, String> data) throws ServerTimedOutException {
-        gameSocket.move(player.move(board));
+        try {
+            int move = player.move(board);
+            gameSocket.move(move);
+        }
+        catch (InterruptedException ignored) { }
     }
 
     @Override
@@ -42,9 +47,7 @@ public class TicTacToeOnline implements OnlineGame {
         Icon currentPlayer = data.get("PLAYER").equals(gameSocket.getPlayerName())
                 ? player.getIcon() : player.getIcon().opponentIcon();
 
-        board.set(Integer.parseInt(data.get("MOVE")), currentPlayer);
-
-        ticTacToeGUI.updateBoard(board);
+        board.set(Integer.parseInt(data.get("MOVE")), currentPlayer);ticTacToeGUI.updateBoard(board);
         ticTacToeGUI.setCurrentPlayer(currentPlayer.opponentIcon());
     }
 

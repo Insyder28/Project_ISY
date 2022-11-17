@@ -4,6 +4,7 @@ import games.Mode;
 import main.GameController;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -42,18 +43,23 @@ class SelectModeWindow extends JFrame implements ActionListener {
         if(e.getSource()==local){
             gui.setSelectedMode(Mode.LOCAL);
             setVisible(false);
-            gui.next();
+            gui.setLastLocation(getLocation());
+            gui.nextWindow();
         }
 
         else if(e.getSource()== online){
             gui.setSelectedMode(Mode.ONLINE);
             setVisible(false);
-            gui.next();
+            gui.setLastLocation(getLocation());
+            gui.nextWindow();
         }
     }
 
     public void mainFrame() {
-        setLocationRelativeTo(null);
+        Point lastLocation = GameController.getInstance().getGUI().getLastLocation();
+
+        if (lastLocation == null) setLocationRelativeTo(null);
+        else setLocation(lastLocation);
         setVisible(true);
     }
 }

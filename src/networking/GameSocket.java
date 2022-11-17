@@ -311,6 +311,9 @@ public class GameSocket implements Closeable {
         catch (Buffer.TimedOutException e) {
             throw new ServerTimedOutException(e);
         }
+        catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         if (response.startsWith("ERR ")) throw new ServerException(response.replace("ERR ", ""));
         return response;

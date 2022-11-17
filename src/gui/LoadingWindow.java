@@ -1,26 +1,32 @@
 package gui;
 
+import main.GameController;
+
 import javax.swing.*;
+import java.awt.*;
 
 class LoadingWindow extends JFrame {
+    JPanel panel = new JPanel();
     JLabel label = new JLabel();
 
     public LoadingWindow() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(null);
         setSize(720, 720);
         setTitle("Game Launcher");
-    }
 
-    public void startLoading(String message) {
+        panel.setLayout(new GridLayout());
+        add(panel);
+
         label.setBounds(250,200,200,100);
-        label.setText(message);
+        label.setFont(new Font("Monospace", Font.BOLD, 50));
+        label.setHorizontalAlignment(JLabel.CENTER);
+        label.setOpaque(true);
 
-        setLocationRelativeTo(null);
-        setVisible(true);
+        panel.add(label);
     }
 
     public void stopLoading() {
         setVisible(false);
+        GameController.getInstance().getGUI().setLastLocation(getLocation());
     }
 }
