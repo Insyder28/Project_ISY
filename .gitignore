@@ -28,8 +28,7 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-# TODO: remove temporary
-### temporary ###
+### Extra ###
 /server
 /javadoc
 /ignored
