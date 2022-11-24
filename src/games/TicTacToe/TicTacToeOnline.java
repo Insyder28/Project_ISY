@@ -1,6 +1,8 @@
-package games;
+package games.TicTacToe;
 
 import events.EventListener;
+import games.data.Board;
+import games.data.Icon;
 import networking.GameSocket;
 import networking.ServerRuntimeException;
 import networking.ServerTimedOutException;

@@ -1,4 +1,4 @@
-package games;
+package games.data;
 
 /**
  * A board class for playing games.
@@ -52,6 +52,10 @@ public class Board {
      */
     public void set(int pos, Icon icon) {
         data[pos / height][pos % height] = icon;
+    }
+
+    public Icon get(int pos) {
+        return data[pos / height][pos % height];
     }
 
     /**

@@ -1,5 +1,7 @@
 package GUI;
 
+import networking.MessageBuffer;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -11,7 +13,7 @@ public class TTTGui extends JFrame implements ActionListener {
     public JPanel title_panel = new JPanel();
     public JLabel textField = new JLabel();
     public JButton[] grid = new JButton[9];
-    public MessageBuffer<Integer> buttonPressed = new MessageBuffer<>();
+    public MessageBuffer buttonPressed = new MessageBuffer();
 
     private final GUI mainGUI;
 
@@ -78,7 +80,7 @@ public class TTTGui extends JFrame implements ActionListener {
 //                    if (grid[i].getText() == "") {
 //                        grid[i].setForeground(new Color(255, 0, 0));
 //                        grid[i].setText("X");
-                    buttonPressed.setMessage(i);
+                    buttonPressed.setMessage(String.valueOf(i));
 
                 }
             }

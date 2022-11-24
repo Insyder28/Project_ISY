@@ -1,5 +1,7 @@
-package games;
+package games.TicTacToe;
 
+import games.data.Board;
+import games.data.Icon;
 import players.Player;
 
 public class TicTacToe {

@@ -1,7 +1,7 @@
 package players;
 
-import games.Board;
-import games.Icon;
+import games.data.Board;
+import games.data.Icon;
 
 import java.util.Scanner;
 
@@ -36,7 +36,7 @@ public class HumanPlayer implements Player {
         Scanner input = new Scanner(System.in);
 
         while (true) {
-            System.out.print("\nPlayer '" + icon.getChar() + "', enter your move (column[1-3] row[1-3]): ");
+            System.out.print("\nPlayer '" + icon.getChar() + "', enter your move (column[1-"+board.width+"] row[1-"+board.height+"]): ");
             int col = input.nextInt() - 1;   // [0-2]
             int row = input.nextInt() - 1;
 
@@ -50,7 +50,7 @@ public class HumanPlayer implements Player {
     }
 
     private boolean validateMove(int row, int col, Board board) {
-        if (row < 0 || row > 2 || col < 0 || col > 2) return false;
+        if (row < 0 || row > board.height-1 || col < 0 || col > board.width-1) return false;
         return board.data[row][col] == Icon.NO_ICON;
     }
 }

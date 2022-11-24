@@ -80,7 +80,7 @@ public class GUI extends JFrame implements ActionListener {
     public int getMove(){
         setCurrentPlayer(icon);
         ttt.buttonPressed.awaitMessage();
-        return ttt.buttonPressed.getMessage();
+        return Integer.parseInt(ttt.buttonPressed.getMessage());
     }
 
     public void updateBoard(char[][] board) {
