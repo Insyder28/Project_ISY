@@ -61,7 +61,7 @@ public class OthelloGUI extends JFrame implements ActionListener {
         for (int i = 0; i < 64; i++) {
             grid[i] = new JButton();
             grid_panel.add(grid[i]);
-            grid[i].setFont(new Font("MV Boli", Font.BOLD, 120));
+            grid[i].setFont(new Font("MV Boli", Font.BOLD, 50));
             grid[i].setFocusable(false);
             grid[i].addActionListener(this);
         }
