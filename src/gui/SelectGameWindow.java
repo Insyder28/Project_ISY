@@ -1,6 +1,6 @@
 package gui;
 
-import games.GameType;
+import games.data.GameType;
 import main.GameController;
 
 import javax.swing.*;

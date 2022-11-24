@@ -10,7 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class TicTacToeGUI extends JFrame implements ActionListener {
+public class OthelloGUI extends JFrame implements ActionListener {
     public JPanel grid_panel = new JPanel();
 
     public JPanel title_panel = new JPanel();
@@ -19,13 +19,13 @@ public class TicTacToeGUI extends JFrame implements ActionListener {
 
     GridLayout titleLayout = new GridLayout(1, 2);
 
-    public JButton[] grid = new JButton[9];
+    public JButton[] grid = new JButton[64];
 
 
     public Buffer<Integer> buttonPressed = new Buffer<>();
 
-    public TicTacToeGUI(boolean showPlayer) {
-        setTitle("TicTacToe");
+    public OthelloGUI(boolean showPlayer) {
+        setTitle("Othello");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(720, 720);
 
@@ -33,7 +33,7 @@ public class TicTacToeGUI extends JFrame implements ActionListener {
 
         setLayout(new BorderLayout());
 
-        grid_panel.setLayout(new GridLayout(3, 3));
+        grid_panel.setLayout(new GridLayout(8, 8));
         grid_panel.setBackground(new Color(150, 150, 150));
 
         currentPlayer.setBackground(new Color(25, 25, 25));
@@ -58,7 +58,7 @@ public class TicTacToeGUI extends JFrame implements ActionListener {
             title_panel.add(player);
         }
 
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 64; i++) {
             grid[i] = new JButton();
             grid_panel.add(grid[i]);
             grid[i].setFont(new Font("MV Boli", Font.BOLD, 120));
@@ -102,7 +102,7 @@ public class TicTacToeGUI extends JFrame implements ActionListener {
             for (int j = 0; j < board.width; j++) {
                 char icon = data[i][j].getChar();
 
-                grid[index].setText(Character.toString(icon));
+                grid[index].setText(String.valueOf(icon));
                 grid[index].setForeground(icon == 'X' ? new Color(0, 0, 255) : new Color(255, 0, 0));
                 index++;
             }
@@ -111,7 +111,7 @@ public class TicTacToeGUI extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 64; i++) {
             if (e.getSource() == grid[i]) {
                 buttonPressed.set(i);
             }

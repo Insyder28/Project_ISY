@@ -1,4 +1,4 @@
-package games;
+package games.data;
 
 /**
  * Represents an icon that can be placed on a {@link Board}.

@@ -1,6 +1,6 @@
 package gui;
 
-import games.Icon;
+import games.data.Icon;
 import main.GameController;
 import players.PlayerType;
 

@@ -1,4 +1,4 @@
-package games;
+package games.data;
 
 /**
  * A board class for playing games.

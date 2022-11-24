@@ -1,7 +1,7 @@
 package players;
 
-import games.Board;
-import games.Icon;
+import games.data.Board;
+import games.data.Icon;
 
 /**
  * Interface that represents a player.

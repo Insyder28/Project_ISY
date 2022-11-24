@@ -1,7 +1,8 @@
 package main;
 
-import games.Icon;
-import games.TicTacToe;
+import games.Othello.Othello;
+import games.data.Icon;
+import games.TicTacToe.TicTacToe;
 import gui.ActionFailedException;
 import gui.GUI;
 import gui.GUIEventListener;
@@ -103,7 +104,12 @@ public class GameController implements GUIEventListener {
 
                 new TicTacToe().startGame(xPlayer, oPlayer);
             }
-            case OTHELLO -> {}
+            case OTHELLO -> {
+                Player xPlayer = gui.getSelectedPlayerType(Icon.CROSS) == PlayerType.HUMAN ? new HumanPlayer() : new AIPlayer();
+                Player oPlayer = gui.getSelectedPlayerType(Icon.NOUGHT) == PlayerType.HUMAN ? new HumanPlayer() : new AIPlayer();
+
+                new Othello().startGame(xPlayer, oPlayer);
+            }
         }
     }
 }

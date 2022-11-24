@@ -1,8 +1,9 @@
 package gui;
 
-import games.GameType;
-import games.Mode;
-import games.Icon;
+import games.Othello.Othello;
+import games.data.GameType;
+import games.data.Mode;
+import games.data.Icon;
 import players.PlayerType;
 
 import java.awt.*;
@@ -30,6 +31,8 @@ public class GUI {
 
     private TicTacToeGUI ticTacToeGUI = null;
 
+    private OthelloGUI othelloGUI = null;
+
     final GUIEventListener guiEventListener;
 
     // Constructor
@@ -41,6 +44,10 @@ public class GUI {
     // Getters and Setters
     public TicTacToeGUI getTicTacToeGUI() {
         return ticTacToeGUI;
+    }
+
+    public OthelloGUI getOthelloGUI() {
+        return othelloGUI;
     }
 
     public GameType getSelectedGameType() {
@@ -101,10 +108,18 @@ public class GUI {
         return startTicTacToe(false);
     }
 
+    public OthelloGUI startOthello() { return startOthello(false); }
+
     public TicTacToeGUI startTicTacToe(boolean showPlayer) {
         if (this.ticTacToeGUI != null) this.ticTacToeGUI.dispose();
         this.ticTacToeGUI = new TicTacToeGUI(showPlayer);
         return this.ticTacToeGUI;
+    }
+
+    public OthelloGUI startOthello(boolean showPlayer) {
+        if (this.othelloGUI != null) this.othelloGUI.dispose();
+        this.othelloGUI = new OthelloGUI(showPlayer);
+        return this.othelloGUI;
     }
 
     // Package private Methods

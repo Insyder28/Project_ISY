@@ -1,5 +1,6 @@
-package games;
+package games.Othello;
 
+import games.data.OnlineGame;
 import gui.GUI;
 import main.GameController;
 import networking.GameSocket;

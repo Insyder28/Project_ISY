@@ -1,7 +1,8 @@
 package players;
 
-import games.Board;
-import games.Icon;
+import games.data.Board;
+import games.data.GameType;
+import games.data.Icon;
 import gui.GUI;
 import main.GameController;
 
@@ -39,8 +40,12 @@ public class HumanPlayer implements Player {
 
         while (true) {
 //            System.out.print("\nPlayer '" + icon.getChar() + "', enter your move (column[1-3] row[1-3]): ");
-            int move = gui.getTicTacToeGUI().getMove();
-
+            int move = 0;
+            if (gui.getSelectedGameType() == GameType.TICTACTOE) {
+                move = gui.getTicTacToeGUI().getMove();
+            } else if (gui.getSelectedGameType() == GameType.OTHELLO) {
+                move = gui.getOthelloGUI().getMove();
+            }
             if (!validateMove(move, board)) {
                 //System.out.println("Invalid Move");
                 continue;
@@ -52,10 +57,10 @@ public class HumanPlayer implements Player {
 
     private boolean validateMove(int move, Board board) {
 
-        int row = move / board.height;
+        int row = move / board.width;
         int col = move % board.width;
 
-        if (move < 0 || move > 8) return false;
+        if (move < 0 || move > board.width*board.height) return false;
         return board.data[row][col] == Icon.NO_ICON;
     }
 }

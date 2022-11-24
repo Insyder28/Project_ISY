@@ -1,8 +1,8 @@
 package networking;
 
 import events.EventListener;
-import games.OnlineGame;
-import games.TicTacToeOnline;
+import games.data.OnlineGame;
+import games.TicTacToe.TicTacToeOnline;
 import players.*;
 import util.Trigger;
 

@@ -1,4 +1,4 @@
-package games;
+package games.data;
 
 public enum Mode {
     ONLINE,
