@@ -2,8 +2,6 @@ package games.TicTacToe;
 
 import games.data.Board;
 import games.data.Icon;
-import gui.TicTacToeGUI;
-import main.GameController;
 import players.Player;
 
 public class TicTacToe {
@@ -18,8 +16,6 @@ public class TicTacToe {
     public void startGame(Player xPlayer, Player oPlayer) {
         if (gameRunning) throw new RuntimeException("Game already running"); //TODO: create custom exception.
         gameRunning = true;
-
-        TicTacToeGUI ticTacToeGUI = GameController.getInstance().getGUI().startTicTacToe();
 
         // Setup
         board.clear();
@@ -46,8 +42,6 @@ public class TicTacToe {
 
                 // Get move from player
                 System.out.println("\n" + player.getIcon() + "'s turn\n" + board);
-                ticTacToeGUI.updateBoard(board);
-                ticTacToeGUI.setCurrentPlayer(player.getIcon());
 
                 int pos;
                 try {
@@ -85,15 +79,11 @@ public class TicTacToe {
         if (winner == null) {
             System.out.println("\nDraw");
             System.out.println(board);
-            ticTacToeGUI.updateBoard(board);
-            ticTacToeGUI.endGame("It's a draw");
             return;
         }
 
         System.out.println("\nWinner is: '" + winner.getIcon().getChar() + "'");
         System.out.println(board);
-        ticTacToeGUI.updateBoard(board);
-        ticTacToeGUI.endGame("Winner is: '" + winner.getIcon().getChar() + "'");
         gameRunning = false;
     }
 
