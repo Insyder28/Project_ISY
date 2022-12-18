@@ -42,7 +42,7 @@ public class Event {
     public void call(String args) {
         canRemove = false;
         for (EventListener el : listeners) {
-            new Thread(() -> el.onEvent(args)).start();
+            el.onEvent(args);
         }
         canRemove = true;
 
