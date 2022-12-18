@@ -2,8 +2,6 @@ package games.Othello;
 
 import games.data.Board;
 import games.data.Icon;
-import gui.OthelloGUI;
-import main.GameController;
 import players.Player;
 
 import java.util.ArrayList;
@@ -20,8 +18,6 @@ public class Othello {
     public void startGame(Player xPlayer, Player oPlayer) {
         if (gameRunning) throw new RuntimeException("Game already running");
         gameRunning = true;
-
-        OthelloGUI othelloGUI = GameController.getInstance().getGUI().startOthello();
 
         // Board setup
         board.clear();
@@ -52,8 +48,6 @@ public class Othello {
                 }
 
                 System.out.println("\n" + player.getIcon() + "'s turn\n" + board);
-                othelloGUI.updateBoard(board);
-                othelloGUI.setCurrentPlayer(player.getIcon());
 
                 int pos;
                 try {
@@ -71,8 +65,6 @@ public class Othello {
 
                     System.out.println("Invalid move!");
                     System.out.println(board);
-                    othelloGUI.updateBoard(board);
-                    othelloGUI.endGame("Invalid move! " + winner.getIcon() + " has won");
 
                     loop = false;
                     break;
@@ -91,8 +83,6 @@ public class Othello {
 
                     System.out.println("No more moves! " + winner.getIcon() + " wins!");
                     System.out.println(board);
-                    othelloGUI.updateBoard(board);
-                    othelloGUI.endGame("No more moves! " + winner.getIcon() + " wins!");
                     loop = false;
                     break;
                 }
@@ -103,8 +93,6 @@ public class Othello {
         if (winner != null) {
             System.out.println(winner.getIcon() + " has won");
             System.out.println(board);
-            othelloGUI.updateBoard(board);
-            othelloGUI.endGame(winner.getIcon() + " has won");
         }
     }
 
