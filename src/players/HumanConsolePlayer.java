@@ -34,7 +34,7 @@ public class HumanConsolePlayer implements Player {
      * @param board The board on witch the player has to do a move.
      * @return A move (1-8).
      */
-    public int move(Board board) throws InterruptedException{
+    public int move(Board board){
         Scanner input = new Scanner(System.in);
 
         while (true) {

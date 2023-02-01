@@ -49,12 +49,7 @@ public class Othello {
 
                 System.out.println("\n" + player.getIcon() + "'s turn\n" + board);
 
-                int pos;
-                try {
-                    pos = player.move(board);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                int pos = player.move(board);
 
                 int row = pos / board.width;
                 int col = pos % board.width;

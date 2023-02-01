@@ -43,13 +43,7 @@ public class TicTacToe {
                 // Get move from player
                 System.out.println("\n" + player.getIcon() + "'s turn\n" + board);
 
-                int pos;
-                try {
-                    pos = player.move(board);
-                }
-                catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                int pos = player.move(board);
 
                 // Validate
                 if (!validateMove(pos)) {

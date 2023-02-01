@@ -9,5 +9,5 @@ import games.data.Icon;
 public interface Player {
     Icon getIcon();
     void setIcon(Icon icon);
-    int move(Board board) throws InterruptedException;
+    int move(Board board);
 }
