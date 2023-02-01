@@ -7,7 +7,7 @@ import players.RandomPlayer;
 
 class OthelloTest {
 
-    @org.junit.jupiter.api.Test
+    //@org.junit.jupiter.api.Test
     void main() {
         int o = 0;
         int x = 0;

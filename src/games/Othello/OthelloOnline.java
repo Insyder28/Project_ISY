@@ -53,9 +53,7 @@ public class OthelloOnline implements OnlineGame {
     @Override
     public void onYourTurn(Map<String, String> data) {
         try {
-            System.out.println("Movin BEACH");
             int move = player.move(board);
-            System.out.println("Move: " + move);
             gameSocket.move(move);
         }
         catch (InterruptedException | ServerTimedOutException ignored) { } catch (ExecutionException e) {
