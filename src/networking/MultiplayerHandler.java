@@ -5,7 +5,6 @@ import games.Othello.OthelloOnline;
 import games.data.OnlineGame;
 import games.TicTacToe.TicTacToeOnline;
 import players.*;
-import util.Trigger;
 
 import java.io.Closeable;
 import java.util.HashMap;
@@ -123,7 +122,7 @@ public class MultiplayerHandler implements Closeable {
 
         switch (playerType) {
             case AI -> player = new OthelloAIMT();
-            case HUMAN -> player = new RandomPlayer();
+            case RANDOM -> player = new RandomPlayer();
             default -> player = new HumanPlayer();
         }
 
