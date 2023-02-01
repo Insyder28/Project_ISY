@@ -23,6 +23,17 @@ public class OthelloOnline implements OnlineGame {
     public OthelloOnline(Player player, GameSocket gameSocket) {
         this.player = player;
         this.gameSocket = gameSocket;
+
+        boardSetup();
+    }
+
+    private void boardSetup() {
+        board.clear();
+        board.set(27, Icon.CROSS);
+        board.set(28, Icon.NOUGHT);
+        board.set(35, Icon.NOUGHT);
+        board.set(36, Icon.CROSS);
+        System.out.println(board);
     }
 
     @Override
@@ -42,7 +53,9 @@ public class OthelloOnline implements OnlineGame {
     @Override
     public void onYourTurn(Map<String, String> data) {
         try {
+            System.out.println("Movin BEACH");
             int move = player.move(board);
+            System.out.println("Move: " + move);
             gameSocket.move(move);
         }
         catch (InterruptedException | ServerTimedOutException ignored) { } catch (ExecutionException e) {

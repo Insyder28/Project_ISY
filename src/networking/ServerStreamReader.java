@@ -18,6 +18,7 @@ public class ServerStreamReader implements Closeable {
     private final EventListener svrEventListener;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService eventExecutor = Executors.newSingleThreadExecutor();
 
     private Buffer<String> messageBuffer;
     private volatile boolean bufferResponse;
@@ -99,7 +100,7 @@ public class ServerStreamReader implements Closeable {
     private void handleMessage(String message) {
         if (message.startsWith("SVR GAME ")) {
             String event = message.replace("SVR ", "");
-            svrEventListener.onEvent(event);
+            eventExecutor.execute(() -> { svrEventListener.onEvent(event); });
         }
 
         else if (bufferResponse) {

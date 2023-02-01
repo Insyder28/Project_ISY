@@ -19,11 +19,6 @@ public class MultiplayerHandler implements Closeable {
 
     private OnlineGame currentGame;
 
-    private final Trigger foundMatch = new Trigger(false);
-    private final Trigger receivedOpponentMove = new Trigger(false);
-    private final Trigger canStartMatch = new Trigger(true);
-    private final Trigger canEndMatch = new Trigger(true);
-
     // Create EventListener objects, so they can be removed from the events later
     private final EventListener onMatch = this::onMatch;
     private final EventListener onYourTurn = this::onYourTurn;
@@ -62,35 +57,18 @@ public class MultiplayerHandler implements Closeable {
     }
 
     private void onMatch(String args) {
-        canStartMatch.await();
-        canStartMatch.set(false);
-
         Map<String, String> data = toMap(args);   // Create map from server data
 
         switch (data.get("GAMETYPE")) {
             case "Tic-tac-toe" -> startTicTacToe();
-            case "reversi" -> startOthello();
+            case "Reversi" -> startOthello();
         }
 
         currentGame.onMatch(data);
-
-        // Set receivedOpponentMove to true when we have to do first move
-        if (data.get("PLAYERTOMOVE").equals(gameSocket.getPlayerName()))
-            receivedOpponentMove.set(true);
-
-        // Set foundMatch to true
-        foundMatch.set(true);
     }
 
     private void onYourTurn(String args) {
         Map<String, String> data = toMap(args);   // Create map from server data
-
-        // Check if onMatch event has been called. If not sleep thread until it is called.
-        foundMatch.await();
-
-        // Check if the opponent move has been set on the board before doing own move.
-        receivedOpponentMove.await();
-        receivedOpponentMove.set(false);
 
         try {
             currentGame.onYourTurn(data);
@@ -101,17 +79,9 @@ public class MultiplayerHandler implements Closeable {
     }
 
     private void onMove(String args) {
-        canEndMatch.set(false);
-        foundMatch.await();
-
         Map<String, String> data = toMap(args);   // Create map from server data
 
         currentGame.onMove(data);
-
-        if (!data.get("PLAYER").equals(gameSocket.getPlayerName()))
-            receivedOpponentMove.set(true);
-
-        canEndMatch.set(true);
     }
 
     private void onLoss(String args) {
@@ -133,10 +103,6 @@ public class MultiplayerHandler implements Closeable {
     }
 
     private void endMatch() {
-        canEndMatch.await();
-        foundMatch.set(false);
-        receivedOpponentMove.set(false);
-        canStartMatch.set(true);
     }
 
 
@@ -156,7 +122,7 @@ public class MultiplayerHandler implements Closeable {
         Player player;
 
         switch (playerType) {
-            case AI -> player = new OthelloMCTS();
+            case AI -> player = new OthelloAIMT();
             case HUMAN -> player = new RandomPlayer();
             default -> player = new HumanPlayer();
         }
