@@ -10,6 +10,7 @@ import networking.ServerTimedOutException;
 import players.Player;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class TicTacToeOnline implements OnlineGame {
     private final Board board = new Board(3, 3);
@@ -42,7 +43,9 @@ public class TicTacToeOnline implements OnlineGame {
             int move = player.move(board);
             gameSocket.move(move);
         }
-        catch (InterruptedException ignored) { }
+        catch (InterruptedException ignored) { } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package networking;
 
 import events.EventListener;
+import games.Othello.OthelloOnline;
 import games.data.OnlineGame;
 import games.TicTacToe.TicTacToeOnline;
 import players.*;
@@ -152,7 +153,15 @@ public class MultiplayerHandler implements Closeable {
     }
 
     private void startOthello() {
+        Player player;
 
+        switch (playerType) {
+            case AI -> player = new OthelloMCTS();
+            case HUMAN -> player = new RandomPlayer();
+            default -> player = new HumanPlayer();
+        }
+
+        currentGame = new OthelloOnline(player, gameSocket);
     }
 
     private void onServerTimeout(Throwable ignored) {

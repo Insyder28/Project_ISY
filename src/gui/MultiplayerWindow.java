@@ -51,7 +51,7 @@ class MultiplayerWindow extends JFrame implements ActionListener {
         }
 
         else if (e.getSource()== Othello){
-            GameController.getInstance().getMultiplayerHandler().subscribe("othello");
+            GameController.getInstance().getMultiplayerHandler().subscribe("reversi");
             gui.setLastLocation(getLocation());
             setVisible(false);
             gui.nextWindow();

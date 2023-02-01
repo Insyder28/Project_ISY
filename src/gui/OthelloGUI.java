@@ -61,9 +61,11 @@ public class OthelloGUI extends JFrame implements ActionListener {
         for (int i = 0; i < 64; i++) {
             grid[i] = new JButton();
             grid_panel.add(grid[i]);
-            grid[i].setFont(new Font("MV Boli", Font.BOLD, 50));
+            //grid[i].setFont(new Font("MV Boli", Font.BOLD, 50));
+            grid[i].setFont(new Font("", Font.BOLD, 50));
             grid[i].setFocusable(false);
             grid[i].addActionListener(this);
+            grid[i].setBackground(new Color(0, 144, 103));
         }
 
         add(grid_panel);
@@ -100,10 +102,12 @@ public class OthelloGUI extends JFrame implements ActionListener {
         int index = 0;
         for (int i = 0; i < board.height; i++) {
             for (int j = 0; j < board.width; j++) {
-                char icon = data[i][j].getChar();
+                char icon = ' ';
+                if (data[i][j] != Icon.NO_ICON)
+                    icon = '●';
 
                 grid[index].setText(String.valueOf(icon));
-                grid[index].setForeground(icon == 'X' ? new Color(0, 0, 255) : new Color(255, 0, 0));
+                grid[index].setForeground(data[i][j] == Icon.CROSS ? new Color(0, 0, 0) : new Color(255, 255, 255));
                 index++;
             }
         }

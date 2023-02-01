@@ -55,15 +55,9 @@ public class RandomPlayer implements Player {
      */
     @Override
     public int move(Board board) {
-        List<Integer> positions = new ArrayList<>();
+        List<int[]> positions = board.generateMoves(icon);
 
-        int pos = 0;
-        for (Icon[] row : board.data) {
-            for (Icon col : row) {
-                if (col == Icon.NO_ICON) positions.add(pos);
-                pos++;
-            }
-        }
+        if (positions.isEmpty()) return -9;
 
         if (delay > 0) {
             try { Thread.sleep(delay); }
@@ -71,6 +65,7 @@ public class RandomPlayer implements Player {
         }
 
         Random rnd = new Random();
-        return positions.get(rnd.nextInt(0, positions.size()));
+        int[] move = positions.get(rnd.nextInt(0, positions.size()));
+        return move[0] * board.height + move[1];
     }
 }

@@ -6,6 +6,8 @@ import gui.TicTacToeGUI;
 import main.GameController;
 import players.Player;
 
+import java.util.concurrent.ExecutionException;
+
 public class TicTacToe {
     private final Board board;
     private boolean gameRunning = false;
@@ -53,7 +55,7 @@ public class TicTacToe {
                 try {
                     pos = player.move(board);
                 }
-                catch (InterruptedException e) {
+                catch (InterruptedException | ExecutionException e) {
                     throw new RuntimeException(e);
                 }
 

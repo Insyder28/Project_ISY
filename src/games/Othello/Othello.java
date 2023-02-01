@@ -8,78 +8,75 @@ import players.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.concurrent.ExecutionException;
 
 public class Othello {
     private final Board board;
     private boolean gameRunning = false;
 
+    private long oldTime = System.currentTimeMillis();
+    private long longestTime = 0;
+
     public Othello() {
         this.board = new Board(8, 8);
     }
 
-    public void startGame(Player xPlayer, Player oPlayer) {
+    public long getLongestTime() {
+        return longestTime;
+    }
+
+    public Icon startGame(Player xPlayer, Player oPlayer) {
         if (gameRunning) throw new RuntimeException("Game already running");
         gameRunning = true;
 
         OthelloGUI othelloGUI = GameController.getInstance().getGUI().startOthello();
 
         // Board setup
-        board.clear();
-        board.set(27, Icon.CROSS);
-        board.set(28, Icon.NOUGHT);
-        board.set(35, Icon.NOUGHT);
-        board.set(36, Icon.CROSS);
-        System.out.println(board);
+        boardSetup();
 
         // Player setup
-        Player[] players = new Player[2];
+        Player[] players = getPlayers(xPlayer, oPlayer);
 
-        players[0] = xPlayer;
-        xPlayer.setIcon(Icon.CROSS);
-
-        players[1] = oPlayer;
-        oPlayer.setIcon(Icon.NOUGHT);
-
+        // Game start
         boolean loop = true;
         Player winner = null;
-        int counter = 0;
 
         while (loop) {
             for (Player player : players) {
-                if (counter >= 60) {    // Board is full
-                    loop = false;
-                    break;
-                }
 
-                System.out.println("\n" + player.getIcon() + "'s turn\n" + board);
+                System.out.println("\n" + player.getIcon() + "'s turn\n");
                 othelloGUI.updateBoard(board);
                 othelloGUI.setCurrentPlayer(player.getIcon());
 
                 int pos;
                 try {
                     pos = player.move(board);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     throw new RuntimeException(e);
                 }
 
-                int row = pos / board.width;
-                int col = pos % board.width;
+                elapsedTime();
 
-                if (!validateMove(row, col, player.getIcon())) {
-                    if (player.getIcon() == Icon.CROSS) winner = oPlayer;
-                    else winner = xPlayer;
+                if (pos != -9) {
+                    int row = pos / board.width;
+                    int col = pos % board.width;
 
-                    System.out.println("Invalid move!");
-                    System.out.println(board);
-                    othelloGUI.updateBoard(board);
-                    othelloGUI.endGame("Invalid move! " + winner.getIcon() + " has won");
+                    if (!validateMove(row, col, player.getIcon())) {
+                        if (player.getIcon() == Icon.CROSS) winner = oPlayer;
+                        else winner = xPlayer;
 
-                    loop = false;
-                    break;
+                        System.out.println("Invalid move!");
+                        System.out.println(board);
+                        othelloGUI.updateBoard(board);
+                        othelloGUI.endGame("Invalid move! " + winner.getIcon() + " has won");
+
+                        loop = false;
+                        break;
+                    }
+
+                    makeMove(row, col, player.getIcon());
                 }
-
-                makeMove(row, col, player.getIcon());
-
                 if (gameOver(board)) {
                     int x = countPieces(Icon.CROSS);
                     int o = countPieces(Icon.NOUGHT);
@@ -96,16 +93,43 @@ public class Othello {
                     loop = false;
                     break;
                 }
-
-                counter++;
             }
         }
-        if (winner != null) {
-            System.out.println(winner.getIcon() + " has won");
-            System.out.println(board);
-            othelloGUI.updateBoard(board);
-            othelloGUI.endGame(winner.getIcon() + " has won");
+        System.out.println(winner.getIcon() + " has won");
+        System.out.println(board);
+        othelloGUI.updateBoard(board);
+        othelloGUI.endGame(winner.getIcon() + " has won");
+        return winner.getIcon();
+    }
+
+    private void elapsedTime() {
+        long currentTime = System.currentTimeMillis();
+        System.out.println(currentTime - oldTime + " milliseconds, this turn");
+        if (currentTime - oldTime > longestTime){
+            longestTime = currentTime - oldTime;
         }
+        System.out.println(longestTime + " milliseconds, at most");
+        oldTime = System.currentTimeMillis();
+    }
+
+    private static Player[] getPlayers(Player xPlayer, Player oPlayer) {
+        Player[] players = new Player[2];
+
+        players[0] = xPlayer;
+        xPlayer.setIcon(Icon.CROSS);
+
+        players[1] = oPlayer;
+        oPlayer.setIcon(Icon.NOUGHT);
+        return players;
+    }
+
+    private void boardSetup() {
+        board.clear();
+        board.set(27, Icon.CROSS);
+        board.set(28, Icon.NOUGHT);
+        board.set(35, Icon.NOUGHT);
+        board.set(36, Icon.CROSS);
+        System.out.println(board);
     }
 
     int countPieces(Icon icon) {
@@ -125,7 +149,6 @@ public class Othello {
 
         for (String dir : directions) {
             if (checkDirection(dir, row, col, icon)) {
-                System.out.println("flipping " + dir);
                 flipDirection(dir, row, col, icon);
             }
         }
@@ -145,11 +168,15 @@ public class Othello {
     }
 
     boolean gameOver(Board board) {
-        return generateMoves(board, Icon.CROSS).isEmpty() && generateMoves(board, Icon.NOUGHT).isEmpty();
+        return board.generateMoves(Icon.CROSS).isEmpty() && board.generateMoves(Icon.NOUGHT).isEmpty();
     }
 
     boolean validateMove(int row, int col, Icon icon) {
         String[] directions = {"UpLeft", "Up", "UpRight", "Left", "Right", "BottomLeft", "Bottom", "BottomRight"};
+
+        if (board.data[row][col] != Icon.NO_ICON) {
+            return false;
+        }
 
         for (String dir : directions) {
             if (checkDirection(dir, row, col, icon)) {
@@ -185,7 +212,7 @@ public class Othello {
             deltaRow = 1;
             deltaCol = 1;
         }
-        if (row + deltaRow < 0 || col + deltaCol < 0 || row + deltaRow >= board.height-1 || col + deltaCol >= board.width-1) {
+        if (row + deltaRow < 0 || col + deltaCol < 0 || row + deltaRow >= board.height || col + deltaCol >= board.width) {
             return false; // out of bounds
         }
         if (board.data[row + deltaRow][col + deltaCol] == oppIcon) {

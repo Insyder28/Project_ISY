@@ -9,10 +9,7 @@ import gui.GUIEventListener;
 import networking.GameSocket;
 import networking.MultiplayerHandler;
 import networking.ServerException;
-import players.AIPlayer;
-import players.HumanPlayer;
-import players.Player;
-import players.PlayerType;
+import players.*;
 import util.InstanceAlreadyExistsException;
 import util.InstanceNotFoundException;
 
@@ -105,8 +102,8 @@ public class GameController implements GUIEventListener {
                 new TicTacToe().startGame(xPlayer, oPlayer);
             }
             case OTHELLO -> {
-                Player xPlayer = gui.getSelectedPlayerType(Icon.CROSS) == PlayerType.HUMAN ? new HumanPlayer() : new AIPlayer();
-                Player oPlayer = gui.getSelectedPlayerType(Icon.NOUGHT) == PlayerType.HUMAN ? new HumanPlayer() : new AIPlayer();
+                Player xPlayer = gui.getSelectedPlayerType(Icon.CROSS) == PlayerType.HUMAN ? new HumanPlayer() : new OthelloAIMT();
+                Player oPlayer = gui.getSelectedPlayerType(Icon.NOUGHT) == PlayerType.HUMAN ? new HumanPlayer() : new OthelloAIMT();
 
                 new Othello().startGame(xPlayer, oPlayer);
             }
