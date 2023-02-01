@@ -69,7 +69,7 @@ public class MultiplayerHandler implements Closeable {
 
         switch (data.get("GAMETYPE")) {
             case "Tic-tac-toe" -> startTicTacToe();
-            case "Othello" -> startOthello();
+            case "reversi" -> startOthello();
         }
 
         currentGame.onMatch(data);

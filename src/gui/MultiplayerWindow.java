@@ -21,7 +21,7 @@ class MultiplayerWindow extends JFrame implements ActionListener {
         ttt.addActionListener(this);
         ttt.setBounds(200, 300, 100, 50);
 
-        Othello.setText("Orthello");
+        Othello.setText("Othello");
         Othello.addActionListener(this);
         Othello.setBounds(400, 300, 100, 50);
 
